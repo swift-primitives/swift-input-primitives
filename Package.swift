@@ -1,0 +1,45 @@
+// swift-tools-version: 6.2
+
+import PackageDescription
+
+let package = Package(
+    name: "swift-input-primitives",
+    platforms: [
+        .macOS(.v26),
+        .iOS(.v26),
+        .tvOS(.v26),
+        .watchOS(.v26),
+        .visionOS(.v26),
+    ],
+    products: [
+        .library(
+            name: "Input Primitives",
+            targets: ["Input Primitives"]
+        ),
+    ],
+    dependencies: [
+        // Tier 0: No primitive dependencies
+    ],
+    targets: [
+        .target(
+            name: "Input Primitives",
+            dependencies: []
+        ),
+        .testTarget(
+            name: "Input Primitives Tests",
+            dependencies: ["Input Primitives"]
+        ),
+    ],
+    swiftLanguageModes: [.v6]
+)
+
+for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
+    let settings: [SwiftSetting] = [
+        .enableUpcomingFeature("ExistentialAny"),
+        .enableUpcomingFeature("InternalImportsByDefault"),
+        .enableUpcomingFeature("MemberImportVisibility"),
+        .enableExperimentalFeature("Lifetimes"),
+        .strictMemorySafety(),
+    ]
+    target.swiftSettings = (target.swiftSettings ?? []) + settings
+}

@@ -30,6 +30,7 @@ extension Input {
     /// All operations use typed throws per [API-ERR-001]:
     /// - `to(_:)` throws ``Error/invalidCheckpoint`` when the checkpoint
     ///   is out of bounds or was not created from this input instance
+    @safe
     public struct Restore<Base: Input.`Protocol`>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafeMutablePointer<Base>
@@ -37,7 +38,7 @@ extension Input {
         @inlinable
         @_lifetime(borrow base)
         init(_ base: UnsafeMutablePointer<Base>) {
-            _base = base
+            unsafe _base = base
         }
 
         /// Restores the input to a previously saved checkpoint.
@@ -47,11 +48,11 @@ extension Input {
         /// - Throws: ``Error/invalidCheckpoint`` if the checkpoint is
         ///   out of bounds or was not created from this input instance.
         @inlinable
-        public func to(_ checkpoint: Base.Checkpoint) throws(__InputRestoreError) {
-            guard _base.pointee.__isValidCheckpoint(checkpoint) else {
+        public func to(_ checkpoint: Base.Checkpoint) throws(Input.Restore<Base>.Error) {
+            guard unsafe _base.pointee.__isValidCheckpoint(checkpoint) else {
                 throw .invalidCheckpoint
             }
-            _base.pointee.__restoreUnchecked(to: checkpoint)
+            unsafe _base.pointee.__restoreUnchecked(to: checkpoint)
         }
     }
 }
@@ -65,6 +66,6 @@ extension Input.Restore {
     ///   and represents a valid position.
     @inlinable
     public func to(__unchecked: Void, _ checkpoint: Base.Checkpoint) {
-        _base.pointee.__restoreUnchecked(to: checkpoint)
+        unsafe _base.pointee.__restoreUnchecked(to: checkpoint)
     }
 }

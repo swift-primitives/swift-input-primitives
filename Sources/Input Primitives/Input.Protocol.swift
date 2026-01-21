@@ -134,7 +134,7 @@ extension Input.`Protocol` {
     @inlinable
     public var restore: Input.Restore<Self> {
         mutating _read {
-            yield Input.Restore(&self)
+            yield unsafe Input.Restore(&self)
         }
     }
 }

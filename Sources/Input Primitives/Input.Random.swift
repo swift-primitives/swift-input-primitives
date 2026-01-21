@@ -76,7 +76,7 @@ extension Input.Random {
     @inlinable
     public var access: Input.Access<Self> {
         mutating _read {
-            yield Input.Access(&self)
+            yield unsafe Input.Access(&self)
         }
     }
 }

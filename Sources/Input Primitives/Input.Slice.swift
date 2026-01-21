@@ -70,7 +70,7 @@ extension Input {
             base: Base,
             startIndex: Base.Index,
             endIndex: Base.Index
-        ) throws(__InputSliceError) {
+        ) throws(Input.Slice<Base>.Error) {
             guard startIndex <= endIndex else {
                 throw .invalidBounds(
                     startIndex: base.distance(from: base.startIndex, to: startIndex),

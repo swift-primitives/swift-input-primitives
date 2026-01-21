@@ -29,6 +29,7 @@ extension Input {
     /// - `first()` throws ``Error/empty`` when input is exhausted
     /// - `first(_:)` throws ``Error/insufficientElements(requested:available:)``
     ///   when requesting more elements than available
+    @safe
     public struct Remove<Base: Input.Streaming>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafeMutablePointer<Base>
@@ -36,7 +37,7 @@ extension Input {
         @inlinable
         @_lifetime(borrow base)
         init(_ base: UnsafeMutablePointer<Base>) {
-            _base = base
+            unsafe _base = base
         }
 
         /// Removes and returns the first element.
@@ -45,11 +46,11 @@ extension Input {
         /// - Throws: ``Error/empty`` if the input is empty.
         @inlinable
         @discardableResult
-        public func first() throws(__InputRemoveError) -> Base.Element {
-            guard !_base.pointee.isEmpty else {
+        public func first() throws(Input.Remove<Base>.Error) -> Base.Element {
+            guard unsafe !_base.pointee.isEmpty else {
                 throw .empty
             }
-            return _base.pointee.__removeFirstUnchecked()
+            return unsafe _base.pointee.__removeFirstUnchecked()
         }
     }
 }
@@ -63,12 +64,12 @@ extension Input.Remove where Base: Input.`Protocol` {
     /// - Throws: ``Error/insufficientElements(requested:available:)``
     ///   if `count` exceeds the remaining elements.
     @inlinable
-    public func first(_ count: Int) throws(__InputRemoveError) {
-        let available = _base.pointee.count
+    public func first(_ count: Int) throws(Input.Remove<Base>.Error) {
+        let available = unsafe _base.pointee.count
         guard count >= 0 && count <= available else {
             throw .insufficientElements(requested: count, available: available)
         }
-        _base.pointee.__removeFirstUnchecked(count)
+        unsafe _base.pointee.__removeFirstUnchecked(count)
     }
 }
 
@@ -82,7 +83,7 @@ extension Input.Remove {
     @inlinable
     @discardableResult
     public func first(__unchecked: Void) -> Base.Element {
-        _base.pointee.__removeFirstUnchecked()
+        unsafe _base.pointee.__removeFirstUnchecked()
     }
 }
 
@@ -92,6 +93,6 @@ extension Input.Remove where Base: Input.`Protocol` {
     /// - Precondition: `count >= 0 && count <= self.count`
     @inlinable
     public func first(__unchecked: Void, _ count: Int) {
-        _base.pointee.__removeFirstUnchecked(count)
+        unsafe _base.pointee.__removeFirstUnchecked(count)
     }
 }

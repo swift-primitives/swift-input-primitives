@@ -23,6 +23,7 @@ extension Input {
     /// All operations use typed throws per [API-ERR-001]:
     /// - `element(at:)` throws ``Error/outOfBounds(offset:count:)``
     ///   when the offset is invalid
+    @safe
     public struct Access<Base: Input.Random>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafePointer<Base>
@@ -30,7 +31,7 @@ extension Input {
         @inlinable
         @_lifetime(borrow base)
         init(_ base: UnsafePointer<Base>) {
-            _base = base
+            unsafe _base = base
         }
 
         /// Accesses the element at the given offset.
@@ -40,12 +41,12 @@ extension Input {
         /// - Throws: ``Error/outOfBounds(offset:count:)`` if the offset
         ///   is negative or exceeds the remaining element count.
         @inlinable
-        public func element(at offset: Int) throws(__InputAccessError) -> Base.Element {
-            let count = _base.pointee.count
+        public func element(at offset: Int) throws(Input.Access<Base>.Error) -> Base.Element {
+            let count = unsafe _base.pointee.count
             guard offset >= 0 && offset < count else {
                 throw .outOfBounds(offset: offset, count: count)
             }
-            return _base.pointee[offset: offset]
+            return unsafe _base.pointee[offset: offset]
         }
     }
 }
@@ -63,9 +64,9 @@ extension Input.Access where Base.Element: Equatable {
     @inlinable
     public func starts<Prefix: Collection>(with prefix: Prefix) -> Bool
     where Prefix.Element == Base.Element {
-        guard prefix.count <= _base.pointee.count else { return false }
+        guard unsafe prefix.count <= _base.pointee.count else { return false }
         for (offset, element) in prefix.enumerated() {
-            if _base.pointee[offset: offset] != element { return false }
+            if unsafe _base.pointee[offset: offset] != element { return false }
         }
         return true
     }
@@ -77,6 +78,6 @@ extension Input.Access where Base.Element: Equatable {
     /// - Complexity: O(1)
     @inlinable
     public func starts(with element: Base.Element) -> Bool {
-        !_base.pointee.isEmpty && _base.pointee[offset: 0] == element
+        unsafe !_base.pointee.isEmpty && _base.pointee[offset: 0] == element
     }
 }

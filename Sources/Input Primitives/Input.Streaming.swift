@@ -86,7 +86,7 @@ extension Input.Streaming {
     @inlinable
     public var remove: Input.Remove<Self> {
         mutating _read {
-            yield Input.Remove(&self)
+            yield unsafe Input.Remove(&self)
         }
     }
 }

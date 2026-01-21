@@ -36,11 +36,11 @@ extension Input {
     /// ## Protocol Hierarchy
     ///
     /// ```
-    /// Input.Streaming  ← minimal, forward-only (isEmpty, first, remove)
+    /// Input.Streaming      ← minimal, forward-only (isEmpty, first, remove)
     ///       ↑
-    /// Input.Protocol   ← adds checkpoint/restore for backtracking
+    /// Input.Protocol       ← adds checkpoint/restore for backtracking
     ///       ↑
-    /// Input.Random     ← adds subscript(offset:), access.starts(with:)
+    /// Input.Access.Random  ← adds subscript(offset:), access.starts(with:)
     /// ```
     ///
     /// ## Capability Factoring
@@ -88,17 +88,21 @@ extension Input {
         /// Conformers provide bounds; validation logic is centralized.
         var checkpointRange: ClosedRange<Checkpoint> { get }
 
-        // MARK: - Unchecked Primitives
+        // MARK: - Primitives
 
-        /// Restores to a checkpoint without validation.
+        /// Sets the cursor position to a checkpoint.
         ///
         /// - Precondition: `checkpointRange.contains(checkpoint)` is true.
-        mutating func __restoreUnchecked(to checkpoint: Checkpoint)
+        ///
+        /// > Note: Conformance primitive. Use `restore.to(_:)` for validated API.
+        mutating func setPosition(to checkpoint: Checkpoint)
 
-        /// Removes `count` elements without checking.
+        /// Advances the cursor by `count` elements.
         ///
         /// - Precondition: `count >= 0 && count <= self.count`
-        mutating func __removeFirstUnchecked(_ count: Int)
+        ///
+        /// > Note: Conformance primitive. Use `remove.first(_:)` for validated API.
+        mutating func advance(by count: Int)
     }
 }
 
@@ -112,7 +116,7 @@ extension Input.`Protocol` where Self: ~Copyable {
     /// - Parameter checkpoint: The checkpoint to validate.
     /// - Returns: `true` if the checkpoint can be restored to.
     @inlinable
-    public func __isValidCheckpoint(_ checkpoint: Checkpoint) -> Bool {
+    public func isValid(_ checkpoint: Checkpoint) -> Bool {
         checkpointRange.contains(checkpoint)
     }
 }
@@ -134,25 +138,3 @@ extension Input.`Protocol` where Self: Copyable {
     }
 }
 
-// MARK: - Restore Accessor
-
-extension Input.`Protocol` where Self: ~Copyable {
-    /// Accessor for checkpoint restoration operations.
-    ///
-    /// Provides checked restoration with typed errors:
-    /// - `to(_:)` throws ``Input/Restore/Error/invalidCheckpoint`` for invalid checkpoints
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// let checkpoint = input.checkpoint
-    /// // ... consume elements ...
-    /// try input.restore.to(checkpoint)
-    /// ```
-    @inlinable
-    public var restore: Input.Restore<Self> {
-        mutating _read {
-            yield unsafe Input.Restore(&self)
-        }
-    }
-}

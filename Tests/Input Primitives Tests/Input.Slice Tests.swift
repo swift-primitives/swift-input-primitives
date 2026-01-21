@@ -125,7 +125,7 @@ extension InputSliceTests.Test.Unit {
     func removeFirstThrowsWhenEmpty() {
         let array: [Int] = []
         var slice = Input.Slice(array[...])
-        #expect(throws: __InputRemoveError.empty) {
+        #expect(throws: Input.Remove.Error.empty) {
             try slice.remove.first()
         }
     }
@@ -223,7 +223,7 @@ extension InputSliceTests.Test.EdgeCase {
     func removeFirstNThrowsWhenInsufficient() {
         let array = [1, 2, 3]
         var slice = Input.Slice(array[...])
-        #expect(throws: __InputRemoveError.insufficientElements(requested: 5, available: 3)) {
+        #expect(throws: Input.Remove.Error.insufficientElements(requested: 5, available: 3)) {
             try slice.remove.first(5)
         }
     }
@@ -262,7 +262,7 @@ extension InputSliceTests.Test.Integration {
         var input = Input.Slice(array[...])
         #expect(try input.access.element(at: 0) == 1)
         #expect(try input.access.element(at: 4) == 5)
-        #expect(throws: __InputAccessError.self) {
+        #expect(throws: Input.Access.Error.self) {
             try input.access.element(at: 10)
         }
     }

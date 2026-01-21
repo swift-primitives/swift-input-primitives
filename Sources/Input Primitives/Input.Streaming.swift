@@ -38,11 +38,11 @@ extension Input {
     /// ## Protocol Hierarchy
     ///
     /// ```
-    /// Input.Streaming  ← minimal, forward-only
+    /// Input.Streaming      ← minimal, forward-only
     ///       ↑
-    /// Input.Protocol   ← adds checkpoint/restore for backtracking
+    /// Input.Protocol       ← adds checkpoint/restore for backtracking
     ///       ↑
-    /// Input.Random     ← adds subscript(offset:), access.starts(with:)
+    /// Input.Access.Random  ← adds subscript(offset:), access.starts(with:)
     /// ```
     public protocol Streaming: ~Copyable {
         /// The element type of the input.
@@ -56,37 +56,16 @@ extension Input {
         /// Returns `nil` if the input is empty. Does not consume the element.
         var first: Element? { get }
 
-        // MARK: - Unchecked Primitives
+        // MARK: - Primitives
 
-        /// Removes and returns the first element without checking.
+        /// Advances the cursor, returning the consumed element.
         ///
         /// - Precondition: `!isEmpty`
-        /// - Returns: The first element.
+        /// - Returns: The consumed element.
         ///
-        /// > Note: This is an implementation primitive. Use `remove.first()`
-        /// > for the checked public API.
+        /// > Note: Conformance primitive. Use `remove.first()` for validated API.
         @discardableResult
-        mutating func __removeFirstUnchecked() -> Element
+        mutating func advance() -> Element
     }
 }
 
-// MARK: - Remove Accessor
-
-extension Input.Streaming where Self: ~Copyable {
-    /// Accessor for element removal operations.
-    ///
-    /// Provides checked removal with typed errors:
-    /// - `first()` throws ``Input/Remove/Error/empty`` when input is exhausted
-    ///
-    /// ## Usage
-    ///
-    /// ```swift
-    /// let element = try input.remove.first()
-    /// ```
-    @inlinable
-    public var remove: Input.Remove<Self> {
-        mutating _read {
-            yield unsafe Input.Remove(&self)
-        }
-    }
-}

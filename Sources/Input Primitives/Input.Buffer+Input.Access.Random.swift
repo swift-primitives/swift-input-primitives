@@ -1,11 +1,11 @@
 //
-//  Input.Buffer+Input.Random.swift
+//  Input.Buffer+Input.Access.Random.swift
 //  swift-input-primitives
 //
-//  Input.Random conformance for Input.Buffer.
+//  Input.Access.Random conformance for Input.Buffer.
 //
 
-extension Input.Buffer: Input.Random {
+extension Input.Buffer: Input.Access.Random {
     @inlinable
     public subscript(offset offset: Int) -> Element {
         storage[position + offset]

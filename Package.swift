@@ -18,6 +18,7 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(path: "../swift-identity-primitives"),
         .package(path: "../swift-index-primitives"),
         .package(path: "../swift-array-primitives"),
     ],
@@ -25,6 +26,7 @@ let package = Package(
         .target(
             name: "Input Primitives",
             dependencies: [
+                .product(name: "Identity Primitives", package: "swift-identity-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
                 .product(name: "Array Primitives", package: "swift-array-primitives"),
             ]

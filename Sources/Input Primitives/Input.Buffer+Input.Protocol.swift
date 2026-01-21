@@ -44,23 +44,23 @@ extension Input.Buffer: Input.`Protocol` {
         Checkpoint(__unchecked: (), position: 0)...Checkpoint(__unchecked: (), position: totalCount)
     }
 
-    // MARK: - Unchecked Primitives
+    // MARK: - Primitives
 
     @inlinable
     @discardableResult
-    public mutating func __removeFirstUnchecked() -> Element {
+    public mutating func advance() -> Element {
         let element = storage[position]
         position += 1
         return element
     }
 
     @inlinable
-    public mutating func __removeFirstUnchecked(_ count: Int) {
+    public mutating func advance(by count: Int) {
         position += count
     }
 
     @inlinable
-    public mutating func __restoreUnchecked(to checkpoint: Checkpoint) {
+    public mutating func setPosition(to checkpoint: Checkpoint) {
         position = checkpoint.position.rawValue
     }
 }

@@ -38,23 +38,23 @@ extension Input.Slice: Input.`Protocol` {
         base.startIndex...endIndex
     }
 
-    // MARK: - Unchecked Primitives
+    // MARK: - Primitives
 
     @inlinable
     @discardableResult
-    public mutating func __removeFirstUnchecked() -> Element {
+    public mutating func advance() -> Element {
         let element = base[startIndex]
         startIndex = base.index(after: startIndex)
         return element
     }
 
     @inlinable
-    public mutating func __removeFirstUnchecked(_ count: Int) {
+    public mutating func advance(by count: Int) {
         startIndex = base.index(startIndex, offsetBy: count)
     }
 
     @inlinable
-    public mutating func __restoreUnchecked(to checkpoint: Checkpoint) {
+    public mutating func setPosition(to checkpoint: Checkpoint) {
         startIndex = checkpoint
     }
 }

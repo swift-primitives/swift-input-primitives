@@ -132,7 +132,7 @@ extension InputBufferTests.Test.Unit {
     @Test("remove.first() throws when empty")
     func removeFirstThrowsWhenEmpty() {
         var buffer = Input.Buffer<Int>([])
-        #expect(throws: Input.Remove<Input.Buffer<Int>>.Error.empty) {
+        #expect(throws: Input.Remove.Error.empty) {
             try buffer.remove.first()
         }
     }
@@ -232,7 +232,7 @@ extension InputBufferTests.Test.EdgeCase {
     @Test("remove.first(n) throws when n > count")
     func removeFirstNThrowsWhenInsufficient() {
         var buffer = Input.Buffer([1, 2, 3])
-        #expect(throws: Input.Remove<Input.Buffer<Int>>.Error.insufficientElements(requested: 5, available: 3)) {
+        #expect(throws: Input.Remove.Error.insufficientElements(requested: 5, available: 3)) {
             try buffer.remove.first(5)
         }
     }
@@ -243,7 +243,7 @@ extension InputBufferTests.Test.EdgeCase {
         // Index<Element> is non-negative by construction, so we can't test -1
         // Test out-of-bounds checkpoint (position 100 for 3-element buffer)
         let invalidCheckpoint: Input.Buffer<Int>.Checkpoint = 100
-        #expect(throws: Input.Restore<Input.Buffer<Int>>.Error.invalidCheckpoint) {
+        #expect(throws: Input.Restore.Error.invalidCheckpoint) {
             try buffer.restore.to(invalidCheckpoint)
         }
     }
@@ -294,7 +294,7 @@ extension InputBufferTests.Test.Integration {
         var input = Input.Buffer([1, 2, 3, 4, 5])
         #expect(try input.access.element(at: 0) == 1)
         #expect(try input.access.element(at: 4) == 5)
-        #expect(throws: Input.Access<Input.Buffer<Int>>.Error.self) {
+        #expect(throws: Input.Access.Error.self) {
             try input.access.element(at: 10)
         }
     }

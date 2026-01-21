@@ -2,97 +2,89 @@
 //  Input.Remove.swift
 //  swift-input-primitives
 //
-//  Accessor for element removal operations.
+//  Namespace and accessor operations for element removal.
 //
 
 extension Input {
-    /// Accessor for element removal operations on input types.
+    /// Namespace for element removal operations.
     ///
-    /// Provides the `first()` operation for consuming elements from the front
-    /// of an input source. Accessed via the `remove` property on input types.
+    /// Also serves as the phantom type tag for ``Accessor`` discrimination.
+    ///
+    /// Contains:
+    /// - ``Error``: Error type for removal operations
+    public enum Remove {}
+}
+
+// MARK: - Accessor Property
+
+extension Input.Streaming where Self: ~Copyable {
+    /// Accessor for element removal operations.
+    ///
+    /// Provides checked removal with typed errors:
+    /// - `first()` throws ``Input/Remove/Error/empty`` when input is exhausted
     ///
     /// ## Usage
     ///
     /// ```swift
-    /// var input = Input.Buffer([1, 2, 3, 4, 5])
-    ///
-    /// // Remove single element
-    /// let first = try input.remove.first()
-    ///
-    /// // Remove multiple elements
-    /// try input.remove.first(3)
+    /// let element = try input.remove.first()
     /// ```
-    ///
-    /// ## Totality
-    ///
-    /// All operations use typed throws per [API-ERR-001]:
-    /// - `first()` throws ``Error/empty`` when input is exhausted
-    /// - `first(_:)` throws ``Error/insufficientElements(requested:available:)``
-    ///   when requesting more elements than available
-    @safe
-    public struct Remove<Base: Input.Streaming & ~Copyable>: ~Copyable, ~Escapable {
-        @usableFromInline
-        let _base: UnsafeMutablePointer<Base>
-
-        @inlinable
-        @_lifetime(borrow base)
-        init(_ base: UnsafeMutablePointer<Base>) {
-            unsafe _base = base
-        }
-
-        /// Removes and returns the first element.
-        ///
-        /// - Returns: The first element.
-        /// - Throws: ``Error/empty`` if the input is empty.
-        @inlinable
-        @discardableResult
-        public func first() throws(Input.Remove<Base>.Error) -> Base.Element {
-            guard unsafe !_base.pointee.isEmpty else {
-                throw .empty
-            }
-            return unsafe _base.pointee.__removeFirstUnchecked()
-        }
-    }
-}
-
-// MARK: - Multi-element removal (requires Input.Protocol)
-
-extension Input.Remove where Base: Input.`Protocol` & ~Copyable {
-    /// Removes and discards the first `count` elements.
-    ///
-    /// - Parameter count: The number of elements to remove.
-    /// - Throws: ``Error/insufficientElements(requested:available:)``
-    ///   if `count` exceeds the remaining elements.
     @inlinable
-    public func first(_ count: Int) throws(Input.Remove<Base>.Error) {
-        let available = unsafe _base.pointee.count
-        guard count >= 0 && count <= available else {
-            throw .insufficientElements(requested: count, available: available)
+    public var remove: Accessor<Self, Input.Remove> {
+        mutating _read {
+            yield unsafe Accessor(&self)
         }
-        unsafe _base.pointee.__removeFirstUnchecked(count)
     }
 }
 
-// MARK: - Unchecked access
+// MARK: - Accessor Operations (Streaming)
 
-extension Input.Remove where Base: ~Copyable {
-    /// Removes and returns the first element without checking.
+extension Accessor where Tag == Input.Remove, Base: Input.Streaming & ~Copyable {
+    /// Removes and returns the first element.
+    ///
+    /// - Returns: The first element.
+    /// - Throws: ``Input/Remove/Error/empty`` if the input is empty.
+    @inlinable
+    @discardableResult
+    public func first() throws(Input.Remove.Error) -> Base.Element {
+        guard unsafe !base.pointee.isEmpty else {
+            throw .empty
+        }
+        return unsafe base.pointee.advance()
+    }
+
+    /// Advances cursor directly without validation.
     ///
     /// - Precondition: `!isEmpty`
-    /// - Returns: The first element.
+    /// - Returns: The consumed element.
     @inlinable
     @discardableResult
     public func first(__unchecked: Void) -> Base.Element {
-        unsafe _base.pointee.__removeFirstUnchecked()
+        unsafe base.pointee.advance()
     }
 }
 
-extension Input.Remove where Base: Input.`Protocol` & ~Copyable {
-    /// Removes `count` elements without checking.
+// MARK: - Accessor Operations (Protocol - multi-element)
+
+extension Accessor where Tag == Input.Remove, Base: Input.`Protocol` & ~Copyable {
+    /// Removes and discards the first `count` elements.
+    ///
+    /// - Parameter count: The number of elements to remove.
+    /// - Throws: ``Input/Remove/Error/insufficientElements(requested:available:)``
+    ///   if `count` exceeds the remaining elements.
+    @inlinable
+    public func first(_ count: Int) throws(Input.Remove.Error) {
+        let available = unsafe base.pointee.count
+        guard count >= 0 && count <= available else {
+            throw .insufficientElements(requested: count, available: available)
+        }
+        unsafe base.pointee.advance(by: count)
+    }
+
+    /// Advances cursor by count directly without validation.
     ///
     /// - Precondition: `count >= 0 && count <= self.count`
     @inlinable
     public func first(__unchecked: Void, _ count: Int) {
-        unsafe _base.pointee.__removeFirstUnchecked(count)
+        unsafe base.pointee.advance(by: count)
     }
 }

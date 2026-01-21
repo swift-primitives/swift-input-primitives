@@ -12,23 +12,35 @@ extension Input {
     /// enabling parser combinators like `OneOf`, `Peek`, and `Not` to try
     /// alternatives and restore position on failure.
     ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// var input = Input.Buffer([1, 2, 3, 4, 5])
+    /// let checkpoint = input.checkpoint
+    ///
+    /// // Try to match something
+    /// let a = try input.remove.first()  // 1
+    /// let b = try input.remove.first()  // 2
+    ///
+    /// // Failed, restore position
+    /// try input.restore.to(checkpoint)
+    /// assert(input.first == 1)  // Back at start
+    /// ```
+    ///
     /// ## Totality
     ///
     /// All operations are total per [API-IMPL-003]:
-    /// - `restore(to:)` throws for invalid checkpoints
-    /// - `removeFirst(_:)` throws when requesting more elements than available
-    ///
-    /// For unchecked access in performance-critical paths, use the
-    /// `__unchecked` variants.
+    /// - `restore.to(_:)` throws for invalid checkpoints
+    /// - `remove.first(_:)` throws when requesting more elements than available
     ///
     /// ## Protocol Hierarchy
     ///
     /// ```
-    /// Input.Streaming      ← minimal, forward-only (isEmpty, first, removeFirst)
+    /// Input.Streaming  ← minimal, forward-only (isEmpty, first, remove)
     ///       ↑
-    /// Input.Protocol       ← adds checkpoint/restore for backtracking
+    /// Input.Protocol   ← adds checkpoint/restore for backtracking
     ///       ↑
-    /// Input.Access.Random  ← adds subscript(offset:), starts(with:)
+    /// Input.Random     ← adds subscript(offset:), starts(with:)
     /// ```
     ///
     /// ## Abstracts Over
@@ -41,21 +53,6 @@ extension Input {
     /// All operations should be O(1) and non-allocating for conforming types.
     /// The protocol does not require random access - only forward iteration
     /// with the ability to save and restore positions.
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// var input = Input.Buffer([1, 2, 3, 4, 5])
-    /// let checkpoint = input.checkpoint
-    ///
-    /// // Try to match something
-    /// let a = try input.removeFirst()  // 1
-    /// let b = try input.removeFirst()  // 2
-    ///
-    /// // Failed, restore position
-    /// try input.restore(to: checkpoint)
-    /// assert(input.first == 1)  // Back at start
-    /// ```
     public protocol `Protocol`<Element>: Streaming where Self: Copyable {
         /// The checkpoint type for position-based backtracking.
         ///
@@ -68,29 +65,33 @@ extension Input {
 
         /// Creates a checkpoint at the current position.
         ///
-        /// The checkpoint can be used with ``restore(to:)`` to backtrack.
+        /// The checkpoint can be used with `restore.to(_:)` to backtrack.
         /// This must be O(1) and should not allocate.
         var checkpoint: Checkpoint { get }
-
-        /// Restores the input to a previously saved checkpoint.
-        ///
-        /// - Parameter checkpoint: A checkpoint obtained from ``checkpoint``.
-        /// - Throws: ``Input/Error/invalidCheckpoint`` if the checkpoint is
-        ///   out of bounds or was not created from this input instance.
-        mutating func restore(to checkpoint: Checkpoint) throws(Input.Error)
-
-        /// Removes and discards the first `n` elements.
-        ///
-        /// - Parameter n: The number of elements to skip.
-        /// - Throws: ``Input/Error/insufficientElements(requested:available:)``
-        ///   if `n > count`.
-        mutating func removeFirst(_ n: Int) throws(Input.Error)
 
         /// The remaining input as the same type (for composability).
         ///
         /// Default implementation returns `self`. Override for types
         /// that need conversion (e.g., Array → ArraySlice).
         var remaining: Self { get }
+
+        // MARK: - Unchecked Primitives
+
+        /// Checks if a checkpoint is valid for this input.
+        ///
+        /// - Parameter checkpoint: The checkpoint to validate.
+        /// - Returns: `true` if the checkpoint can be restored to.
+        func __isValidCheckpoint(_ checkpoint: Checkpoint) -> Bool
+
+        /// Restores to a checkpoint without validation.
+        ///
+        /// - Precondition: `__isValidCheckpoint(checkpoint)` is true.
+        mutating func __restoreUnchecked(to checkpoint: Checkpoint)
+
+        /// Removes `count` elements without checking.
+        ///
+        /// - Precondition: `count >= 0 && count <= self.count`
+        mutating func __removeFirstUnchecked(_ count: Int)
     }
 }
 
@@ -104,27 +105,27 @@ extension Input.`Protocol` {
     }
 }
 
-// MARK: - Unchecked Access
+// MARK: - Restore Accessor
 
 extension Input.`Protocol` {
-    /// Restores to checkpoint without validation.
+    /// Accessor for checkpoint restoration operations.
     ///
-    /// Use in performance-critical paths where the checkpoint is known valid.
+    /// Provides checked restoration with typed errors:
+    /// - `to(_:)` throws ``Input/Restore/Error/invalidCheckpoint`` for invalid checkpoints
     ///
-    /// - Precondition: `checkpoint` was created from this input instance
-    ///   and represents a valid position.
+    /// ## Usage
+    ///
+    /// ```swift
+    /// let checkpoint = input.checkpoint
+    /// // ... consume elements ...
+    /// try input.restore.to(checkpoint)
+    /// ```
     @inlinable
-    public mutating func restore(__unchecked: Void, to checkpoint: Checkpoint) {
-        try! restore(to: checkpoint)
-    }
-
-    /// Removes `n` elements without bounds checking.
-    ///
-    /// Use in performance-critical paths where `n <= count` is known.
-    ///
-    /// - Precondition: `n >= 0` and `n <= count`.
-    @inlinable
-    public mutating func removeFirst(__unchecked: Void, _ n: Int) {
-        try! removeFirst(n)
+    public var restore: Input.Restore<Self> {
+        mutating get {
+            withUnsafeMutablePointer(to: &self) { ptr in
+                Input.Restore(ptr)
+            }
+        }
     }
 }

@@ -11,7 +11,7 @@ extension Input {
     /// `Streaming` represents the minimal interface for forward-only input:
     /// - Check for end of input (`isEmpty`)
     /// - Peek at next element (`first`)
-    /// - Consume next element (`removeFirst()`)
+    /// - Consume elements via `remove` accessor
     ///
     /// Unlike ``Input/Protocol``, this protocol does not require checkpointing
     /// or backtracking support, making it suitable for:
@@ -19,23 +19,30 @@ extension Input {
     /// - Large file parsing (where buffering is expensive)
     /// - Committed-choice parsing (where backtracking is not needed)
     ///
+    /// ## Usage
+    ///
+    /// ```swift
+    /// var input = Input.Buffer([1, 2, 3])
+    /// while !input.isEmpty {
+    ///     let element = try input.remove.first()
+    ///     process(element)
+    /// }
+    /// ```
+    ///
     /// ## Totality
     ///
     /// All operations are total per [API-IMPL-003]:
     /// - `isEmpty` and `first` are inherently total
-    /// - `removeFirst()` uses typed throws for empty input
-    ///
-    /// For unchecked access in performance-critical paths, use
-    /// `removeFirst(__unchecked:)`.
+    /// - `remove.first()` uses typed throws via ``Input/Remove/Error``
     ///
     /// ## Protocol Hierarchy
     ///
     /// ```
-    /// Input.Streaming      ← minimal, forward-only
+    /// Input.Streaming  ← minimal, forward-only
     ///       ↑
-    /// Input.Protocol       ← adds checkpoint/restore for backtracking
+    /// Input.Protocol   ← adds checkpoint/restore for backtracking
     ///       ↑
-    /// Input.Access.Random  ← adds subscript(offset:), starts(with:)
+    /// Input.Random     ← adds subscript(offset:), starts(with:)
     /// ```
     public protocol Streaming: ~Copyable {
         /// The element type of the input.
@@ -49,28 +56,39 @@ extension Input {
         /// Returns `nil` if the input is empty. Does not consume the element.
         var first: Element? { get }
 
-        /// Removes and returns the first element.
+        // MARK: - Unchecked Primitives
+
+        /// Removes and returns the first element without checking.
         ///
+        /// - Precondition: `!isEmpty`
         /// - Returns: The first element.
-        /// - Throws: ``Input/Error/empty`` if the input is empty.
+        ///
+        /// > Note: This is an implementation primitive. Use `remove.first()`
+        /// > for the checked public API.
         @discardableResult
-        mutating func removeFirst() throws(Input.Error) -> Element
+        mutating func __removeFirstUnchecked() -> Element
     }
 }
 
-// MARK: - Unchecked Access
+// MARK: - Remove Accessor
 
 extension Input.Streaming {
-    /// Removes and returns the first element without bounds checking.
+    /// Accessor for element removal operations.
     ///
-    /// Use this in performance-critical paths where you have already
-    /// verified `!isEmpty`.
+    /// Provides checked removal with typed errors:
+    /// - `first()` throws ``Input/Remove/Error/empty`` when input is exhausted
     ///
-    /// - Precondition: `!isEmpty`
-    /// - Returns: The first element.
+    /// ## Usage
+    ///
+    /// ```swift
+    /// let element = try input.remove.first()
+    /// ```
     @inlinable
-    public mutating func removeFirst(__unchecked: Void) -> Element {
-        try! removeFirst()
+    public var remove: Input.Remove<Self> {
+        mutating get {
+            withUnsafeMutablePointer(to: &self) { ptr in
+                Input.Remove(ptr)
+            }
+        }
     }
 }
-

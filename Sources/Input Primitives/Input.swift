@@ -14,11 +14,11 @@
 /// ## Protocol Hierarchy
 ///
 /// ```
-/// Input.Streaming      ← minimal forward-only (isEmpty, first, removeFirst)
+/// Input.Streaming  ← minimal forward-only (isEmpty, first, remove)
 ///        ↑
-/// Input.Protocol       ← adds checkpoint/restore, count, removeFirst(n)
+/// Input.Protocol   ← adds checkpoint/restore, count, remove.first(_:)
 ///        ↑
-/// Input.Access.Random  ← adds subscript(offset:), starts(with:)
+/// Input.Random     ← adds subscript(offset:), starts(with:)
 /// ```
 ///
 /// ## Concrete Types
@@ -41,9 +41,9 @@
 /// ```swift
 /// var input = Input.Buffer([0x48, 0x65, 0x6C, 0x6C, 0x6F])
 /// let checkpoint = input.checkpoint
-/// let first = input.removeFirst()  // 0x48
-/// input.restore(to: checkpoint)
-/// assert(input.first == 0x48)      // Back to start
+/// let first = try input.remove.first()  // 0x48
+/// try input.restore.to(checkpoint)
+/// assert(input.first == 0x48)           // Back to start
 /// ```
 ///
 /// ## Scope

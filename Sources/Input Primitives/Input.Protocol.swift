@@ -63,7 +63,7 @@ extension Input {
     /// All operations should be O(1) and non-allocating for conforming types.
     /// The protocol does not require random access - only forward iteration
     /// with the ability to save and restore positions.
-    public protocol `Protocol`<Element>: Streaming {
+    public protocol `Protocol`<Element>: Streaming, ~Copyable {
         /// The checkpoint type for position-based backtracking.
         ///
         /// Typically a lightweight value like `Int` or an index type.
@@ -118,7 +118,7 @@ extension Input.`Protocol` where Self: Copyable {
 
 // MARK: - Restore Accessor
 
-extension Input.`Protocol` {
+extension Input.`Protocol` where Self: ~Copyable {
     /// Accessor for checkpoint restoration operations.
     ///
     /// Provides checked restoration with typed errors:

@@ -72,7 +72,7 @@ extension Input {
 
 // MARK: - Remove Accessor
 
-extension Input.Streaming {
+extension Input.Streaming where Self: ~Copyable {
     /// Accessor for element removal operations.
     ///
     /// Provides checked removal with typed errors:

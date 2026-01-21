@@ -30,7 +30,7 @@ public enum __InputRestoreError: Swift.Error, Sendable, Equatable {
 
 // MARK: - Typealias (Nest.Name API)
 
-extension Input.Restore {
+extension Input.Restore where Base: ~Copyable {
     /// Errors for checkpoint restoration operations.
     ///
     /// Thrown by ``Input/Protocol`` restoration operations when the

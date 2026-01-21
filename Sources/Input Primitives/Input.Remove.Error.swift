@@ -38,7 +38,7 @@ public enum __InputRemoveError: Swift.Error, Sendable, Equatable {
 
 // MARK: - Typealias (Nest.Name API)
 
-extension Input.Remove {
+extension Input.Remove where Base: ~Copyable {
     /// Errors for element removal operations.
     ///
     /// Thrown by ``Input/Streaming`` removal operations when the input

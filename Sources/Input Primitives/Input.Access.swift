@@ -24,7 +24,7 @@ extension Input {
     /// - `element(at:)` throws ``Error/outOfBounds(offset:count:)``
     ///   when the offset is invalid
     @safe
-    public struct Access<Base: Input.Random>: ~Copyable, ~Escapable {
+    public struct Access<Base: Input.Random & ~Copyable>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafePointer<Base>
 
@@ -53,7 +53,7 @@ extension Input {
 
 // MARK: - Prefix Comparison
 
-extension Input.Access where Base.Element: Equatable {
+extension Input.Access where Base: ~Copyable, Base.Element: Equatable {
     /// Checks if remaining elements start with the given prefix.
     ///
     /// - Parameter prefix: Collection to compare against.

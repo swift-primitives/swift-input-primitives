@@ -46,7 +46,7 @@ extension Input {
     ///
     /// - ``subscript(offset:)`` must be O(1) for conforming types
     /// - ``Input/Access/starts(with:)-1`` must be O(prefix.count) without allocation
-    public protocol Random<Element>: Input.`Protocol` {
+    public protocol Random<Element>: Input.`Protocol`, ~Copyable {
         /// Accesses the element at the given offset from current position.
         ///
         /// This is unchecked per stdlib Collection subscript convention.
@@ -61,7 +61,7 @@ extension Input {
 
 // MARK: - Access Accessor
 
-extension Input.Random {
+extension Input.Random where Self: ~Copyable {
     /// Accessor for random element access operations.
     ///
     /// Provides checked access with typed errors:

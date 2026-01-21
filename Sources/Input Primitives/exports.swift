@@ -2,3 +2,4 @@
 // Re-export dependencies for consumers.
 
 @_exported import Index_Primitives
+@_exported import Array_Primitives

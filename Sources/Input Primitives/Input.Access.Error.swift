@@ -34,7 +34,7 @@ public enum __InputAccessError: Swift.Error, Sendable, Equatable {
 
 // MARK: - Typealias (Nest.Name API)
 
-extension Input.Access {
+extension Input.Access where Base: ~Copyable {
     /// Errors for element access operations.
     ///
     /// Thrown by ``Input/Random`` access operations when the offset

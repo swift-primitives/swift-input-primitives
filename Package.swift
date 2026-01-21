@@ -19,12 +19,14 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../swift-index-primitives"),
+        .package(path: "../swift-array-primitives"),
     ],
     targets: [
         .target(
             name: "Input Primitives",
             dependencies: [
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
+                .product(name: "Array Primitives", package: "swift-array-primitives"),
             ]
         ),
         .testTarget(

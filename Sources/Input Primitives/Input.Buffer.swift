@@ -8,8 +8,8 @@
 extension Input {
     /// Owned buffer cursor for parsing.
     ///
-    /// Stores an owned `[Element]` array with a position cursor.
-    /// Fully `Sendable` because storage is a value type.
+    /// Stores an owned ``Array/Bounded`` array with a position cursor.
+    /// Move-only (`~Copyable`) because the underlying storage is move-only.
     ///
     /// ## Invariants
     ///
@@ -19,8 +19,8 @@ extension Input {
     ///
     /// ## Sendable
     ///
-    /// Fully `Sendable` because storage is an owned `[Element]` value type.
-    /// Safe to transfer across concurrency domains.
+    /// `Sendable` when `Element: Sendable`. Safe to transfer across
+    /// concurrency domains.
     ///
     /// ## Example
     ///
@@ -33,10 +33,10 @@ extension Input {
     /// input.restore(to: checkpoint)
     /// assert(input.first == 0x48)
     /// ```
-    public struct Buffer<Element: Sendable>: Sendable {
+    public struct Buffer<Element: Sendable & Copyable>: ~Copyable {
         /// The underlying storage.
         @usableFromInline
-        var storage: [Element]
+        var storage: Array<Element>.Bounded
 
         /// The current position in the storage.
         @usableFromInline
@@ -47,7 +47,11 @@ extension Input {
         /// - Parameter elements: The array to wrap.
         @inlinable
         public init(_ elements: [Element]) {
-            self.storage = elements
+            self.storage = Array<Element>.Bounded(
+                __unchecked: (),
+                count: elements.count,
+                initializingWith: { elements[$0] }
+            )
             self.position = 0
         }
 
@@ -56,7 +60,12 @@ extension Input {
         /// - Parameter sequence: The sequence to copy into the buffer.
         @inlinable
         public init<S: Sequence>(_ sequence: S) where S.Element == Element {
-            self.storage = Array(sequence)
+            let elements = Swift.Array(sequence)
+            self.storage = Array<Element>.Bounded(
+                __unchecked: (),
+                count: elements.count,
+                initializingWith: { elements[$0] }
+            )
             self.position = 0
         }
 
@@ -67,8 +76,16 @@ extension Input {
         ///   - count: The number of times to repeat the element.
         @inlinable
         public init(repeating element: Element, count: Int) {
-            self.storage = Array(repeating: element, count: count)
+            self.storage = Array<Element>.Bounded(
+                __unchecked: (),
+                count: Swift.max(0, count),
+                initializingWith: { _ in element }
+            )
             self.position = 0
         }
     }
 }
+
+// MARK: - Sendable
+
+extension Input.Buffer: @unchecked Sendable where Element: Sendable {}

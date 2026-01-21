@@ -31,7 +31,7 @@ extension Input {
     /// - `to(_:)` throws ``Error/invalidCheckpoint`` when the checkpoint
     ///   is out of bounds or was not created from this input instance
     @safe
-    public struct Restore<Base: Input.`Protocol`>: ~Copyable, ~Escapable {
+    public struct Restore<Base: Input.`Protocol` & ~Copyable>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafeMutablePointer<Base>
 
@@ -59,7 +59,7 @@ extension Input {
 
 // MARK: - Unchecked access
 
-extension Input.Restore {
+extension Input.Restore where Base: ~Copyable {
     /// Restores to checkpoint without validation.
     ///
     /// - Precondition: `checkpoint` was created from this input instance

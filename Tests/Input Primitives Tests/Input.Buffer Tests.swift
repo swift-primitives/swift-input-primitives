@@ -28,7 +28,7 @@ extension InputBufferTests.Test.Unit {
         let buffer = Input.Buffer([1, 2, 3, 4, 5])
         #expect(buffer.count == 5)
         #expect(buffer.first == 1)
-        #expect(!buffer.isEmpty)
+        #expect(buffer.isEmpty == false)
     }
 
     @Test("init from sequence")
@@ -48,7 +48,7 @@ extension InputBufferTests.Test.Unit {
     @Test("isEmpty returns true for empty buffer")
     func isEmptyForEmptyBuffer() {
         let buffer = Input.Buffer<Int>([])
-        #expect(buffer.isEmpty)
+        #expect(buffer.isEmpty == true)
         #expect(buffer.count == 0)
         #expect(buffer.first == nil)
     }
@@ -126,14 +126,8 @@ extension InputBufferTests.Test.Unit {
         #expect(buffer.access.starts(with: 2) == false)
     }
 
-    @Test("remaining returns self")
-    func remainingReturnsSelf() throws {
-        var buffer = Input.Buffer([1, 2, 3])
-        _ = try buffer.remove.first()
-        let remaining = buffer.remaining
-        #expect(remaining.count == buffer.count)
-        #expect(remaining.first == buffer.first)
-    }
+    // Note: remaining property requires Copyable conformance.
+    // Input.Buffer is now ~Copyable, so this test is removed.
 
     @Test("remove.first() throws when empty")
     func removeFirstThrowsWhenEmpty() {
@@ -148,7 +142,7 @@ extension InputBufferTests.Test.Unit {
         var buffer = Input.Buffer<Int>([])
         let result = try? buffer.remove.first()
         #expect(result == nil)
-        #expect(buffer.isEmpty)
+        #expect(buffer.isEmpty == true)
         #expect(buffer.count == 0)
     }
 
@@ -168,11 +162,11 @@ extension InputBufferTests.Test.EdgeCase {
     @Test("single element buffer")
     func singleElementBuffer() throws {
         var buffer = Input.Buffer([42])
-        #expect(!buffer.isEmpty)
+        #expect(buffer.isEmpty == false)
         #expect(buffer.first == 42)
         let cp = buffer.checkpoint
         #expect(try buffer.remove.first() == 42)
-        #expect(buffer.isEmpty)
+        #expect(buffer.isEmpty == true)
         try buffer.restore.to(cp)
         #expect(buffer.first == 42)
     }
@@ -183,9 +177,9 @@ extension InputBufferTests.Test.EdgeCase {
         _ = try buffer.remove.first()
         _ = try buffer.remove.first()
         let cpAtEnd = buffer.checkpoint
-        #expect(buffer.isEmpty)
+        #expect(buffer.isEmpty == true)
         try buffer.restore.to(cpAtEnd)
-        #expect(buffer.isEmpty)
+        #expect(buffer.isEmpty == true)
     }
 
     @Test("nested checkpoint restore")
@@ -287,11 +281,11 @@ extension InputBufferTests.Test.Integration {
     func completeConsumption() throws {
         var input = Input.Buffer([1, 2, 3])
         var consumed: [Int] = []
-        while !input.isEmpty {
+        while input.isEmpty == false {
             consumed.append(try input.remove.first())
         }
         #expect(consumed == [1, 2, 3])
-        #expect(input.isEmpty)
+        #expect(input.isEmpty == true)
         #expect(input.consumedCount == 3)
     }
 

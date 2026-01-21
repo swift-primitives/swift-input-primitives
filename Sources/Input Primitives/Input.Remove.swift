@@ -30,7 +30,7 @@ extension Input {
     /// - `first(_:)` throws ``Error/insufficientElements(requested:available:)``
     ///   when requesting more elements than available
     @safe
-    public struct Remove<Base: Input.Streaming>: ~Copyable, ~Escapable {
+    public struct Remove<Base: Input.Streaming & ~Copyable>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafeMutablePointer<Base>
 
@@ -57,7 +57,7 @@ extension Input {
 
 // MARK: - Multi-element removal (requires Input.Protocol)
 
-extension Input.Remove where Base: Input.`Protocol` {
+extension Input.Remove where Base: Input.`Protocol` & ~Copyable {
     /// Removes and discards the first `count` elements.
     ///
     /// - Parameter count: The number of elements to remove.
@@ -75,7 +75,7 @@ extension Input.Remove where Base: Input.`Protocol` {
 
 // MARK: - Unchecked access
 
-extension Input.Remove {
+extension Input.Remove where Base: ~Copyable {
     /// Removes and returns the first element without checking.
     ///
     /// - Precondition: `!isEmpty`
@@ -87,7 +87,7 @@ extension Input.Remove {
     }
 }
 
-extension Input.Remove where Base: Input.`Protocol` {
+extension Input.Remove where Base: Input.`Protocol` & ~Copyable {
     /// Removes `count` elements without checking.
     ///
     /// - Precondition: `count >= 0 && count <= self.count`

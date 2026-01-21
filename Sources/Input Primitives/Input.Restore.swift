@@ -8,17 +8,17 @@
 extension Input {
     /// Namespace for checkpoint restoration operations.
     ///
-    /// Also serves as the phantom type tag for ``Facet`` discrimination.
+    /// Also serves as the phantom type tag for ``Property``.``View`` discrimination.
     ///
     /// Contains:
     /// - ``Error``: Error type for restoration operations
     public enum Restore {}
 }
 
-// MARK: - Facet Property
+// MARK: - Property Accessor
 
 extension Input.`Protocol` where Self: ~Copyable {
-    /// Facet for checkpoint restoration operations.
+    /// Property view for checkpoint restoration operations.
     ///
     /// Provides checked restoration with typed errors:
     /// - `to(_:)` throws ``Input/Restore/Error/invalidCheckpoint`` for invalid checkpoints
@@ -31,16 +31,16 @@ extension Input.`Protocol` where Self: ~Copyable {
     /// try input.restore.to(checkpoint)
     /// ```
     @inlinable
-    public var restore: Facet<Self, Input.Restore> {
+    public var restore: Property<Input.Restore, Self>.View {
         mutating _read {
-            yield unsafe Facet(&self)
+            yield unsafe Property.View(&self)
         }
     }
 }
 
-// MARK: - Facet Operations
+// MARK: - Property Operations
 
-extension Facet where Tag == Input.Restore, Base: Input.`Protocol` & ~Copyable {
+extension Property.View where Tag == Input.Restore, Base: Input.`Protocol` & ~Copyable {
     /// Restores the input to a previously saved checkpoint.
     ///
     /// - Parameter checkpoint: A checkpoint obtained from the input's

@@ -8,17 +8,17 @@
 extension Input {
     /// Namespace for element removal operations.
     ///
-    /// Also serves as the phantom type tag for ``Facet`` discrimination.
+    /// Also serves as the phantom type tag for ``Property``.``View`` discrimination.
     ///
     /// Contains:
     /// - ``Error``: Error type for removal operations
     public enum Remove {}
 }
 
-// MARK: - Facet Property
+// MARK: - Property Accessor
 
 extension Input.Streaming where Self: ~Copyable {
-    /// Facet for element removal operations.
+    /// Property view for element removal operations.
     ///
     /// Provides checked removal with typed errors:
     /// - `first()` throws ``Input/Remove/Error/empty`` when input is exhausted
@@ -29,16 +29,16 @@ extension Input.Streaming where Self: ~Copyable {
     /// let element = try input.remove.first()
     /// ```
     @inlinable
-    public var remove: Facet<Self, Input.Remove> {
+    public var remove: Property<Input.Remove, Self>.View {
         mutating _read {
-            yield unsafe Facet(&self)
+            yield unsafe Property.View(&self)
         }
     }
 }
 
-// MARK: - Facet Operations (Streaming)
+// MARK: - Property Operations (Streaming)
 
-extension Facet where Tag == Input.Remove, Base: Input.Streaming & ~Copyable {
+extension Property.View where Tag == Input.Remove, Base: Input.Streaming & ~Copyable {
     /// Removes and returns the first element.
     ///
     /// - Returns: The first element.
@@ -63,9 +63,9 @@ extension Facet where Tag == Input.Remove, Base: Input.Streaming & ~Copyable {
     }
 }
 
-// MARK: - Facet Operations (Protocol - multi-element)
+// MARK: - Property Operations (Protocol - multi-element)
 
-extension Facet where Tag == Input.Remove, Base: Input.`Protocol` & ~Copyable {
+extension Property.View where Tag == Input.Remove, Base: Input.`Protocol` & ~Copyable {
     /// Removes and discards the first `count` elements.
     ///
     /// - Parameter count: The number of elements to remove.

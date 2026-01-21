@@ -10,7 +10,7 @@
 extension Input {
     /// Namespace for random access types and operations.
     ///
-    /// Also serves as the phantom type tag for ``Facet`` discrimination.
+    /// Also serves as the phantom type tag for ``Property``.``View`` discrimination.
     ///
     /// Contains:
     /// - ``Random``: Protocol for random access capability
@@ -73,10 +73,10 @@ extension Input {
     }
 }
 
-// MARK: - Facet Property
+// MARK: - Property Accessor
 
 extension Input.Access.Random where Self: ~Copyable {
-    /// Facet for random element access operations.
+    /// Property view for random element access operations.
     ///
     /// Provides checked access with typed errors:
     /// - `element(at:)` throws ``Input/Access/Error/outOfBounds(offset:count:)``
@@ -88,16 +88,16 @@ extension Input.Access.Random where Self: ~Copyable {
     /// let third = try input.access.element(at: 2)
     /// ```
     @inlinable
-    public var access: Facet<Self, Input.Access> {
+    public var access: Property<Input.Access, Self>.View {
         mutating _read {
-            yield unsafe Facet(&self)
+            yield unsafe Property.View(&self)
         }
     }
 }
 
-// MARK: - Facet Operations
+// MARK: - Property Operations
 
-extension Facet where Tag == Input.Access, Base: Input.Access.Random & ~Copyable {
+extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~Copyable {
     /// Accesses the element at the given offset.
     ///
     /// - Parameter offset: Offset from current position (0-indexed).
@@ -114,7 +114,7 @@ extension Facet where Tag == Input.Access, Base: Input.Access.Random & ~Copyable
     }
 }
 
-extension Facet where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Equatable {
+extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Equatable {
     /// Checks if remaining elements start with the given prefix.
     ///
     /// - Parameter prefix: Collection to compare against.

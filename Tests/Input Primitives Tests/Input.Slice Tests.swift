@@ -94,21 +94,21 @@ extension InputSliceTests.Test.Unit {
         #expect(slice[offset: 4] == 50)
     }
 
-    @Test("starts(with:) prefix check")
+    @Test("access.starts(with:) prefix check")
     func startsWithPrefixCheck() {
         let array = [1, 2, 3, 4, 5]
-        let slice = Input.Slice(array[...])
-        #expect(slice.starts(with: [1, 2, 3]))
-        #expect(!slice.starts(with: [1, 2, 4]))
-        #expect(!slice.starts(with: [1, 2, 3, 4, 5, 6]))
+        var slice = Input.Slice(array[...])
+        #expect(slice.access.starts(with: [1, 2, 3]) == true)
+        #expect(slice.access.starts(with: [1, 2, 4]) == false)
+        #expect(slice.access.starts(with: [1, 2, 3, 4, 5, 6]) == false)
     }
 
-    @Test("starts(with:) single element")
+    @Test("access.starts(with:) single element")
     func startsWithSingleElement() {
         let array = [1, 2, 3]
-        let slice = Input.Slice(array[...])
-        #expect(slice.starts(with: 1))
-        #expect(!slice.starts(with: 2))
+        var slice = Input.Slice(array[...])
+        #expect(slice.access.starts(with: 1) == true)
+        #expect(slice.access.starts(with: 2) == false)
     }
 
     @Test("remaining returns self")
@@ -203,11 +203,11 @@ extension InputSliceTests.Test.EdgeCase {
         #expect(slice.first == 1)
     }
 
-    @Test("starts(with:) empty prefix returns true")
+    @Test("access.starts(with:) empty prefix returns true")
     func startsWithEmptyPrefix() {
         let array = [1, 2, 3]
-        let slice = Input.Slice(array[...])
-        #expect(slice.starts(with: [] as [Int]))
+        var slice = Input.Slice(array[...])
+        #expect(slice.access.starts(with: []) == true)
     }
 
     @Test("offset access after partial consumption")
@@ -247,7 +247,7 @@ extension InputSliceTests.Test.Integration {
         var input = Input.Slice(bytes[...])
 
         let cp = input.checkpoint
-        #expect(input.starts(with: [0x48, 0x65])) // "He"
+        #expect(input.access.starts(with: [0x48, 0x65]) == true) // "He"
         _ = try input.remove.first()
         _ = try input.remove.first()
         #expect(input.first == 0x6C) // 'l'
@@ -259,7 +259,7 @@ extension InputSliceTests.Test.Integration {
     @Test("access.element(at:) total accessor")
     func elementAtTotalAccessor() throws {
         let array = [1, 2, 3, 4, 5]
-        let input = Input.Slice(array[...])
+        var input = Input.Slice(array[...])
         #expect(try input.access.element(at: 0) == 1)
         #expect(try input.access.element(at: 4) == 5)
         #expect(throws: __InputAccessError.self) {

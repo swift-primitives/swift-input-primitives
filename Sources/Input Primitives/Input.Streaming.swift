@@ -42,7 +42,7 @@ extension Input {
     ///       ↑
     /// Input.Protocol   ← adds checkpoint/restore for backtracking
     ///       ↑
-    /// Input.Random     ← adds subscript(offset:), starts(with:)
+    /// Input.Random     ← adds subscript(offset:), access.starts(with:)
     /// ```
     public protocol Streaming: ~Copyable {
         /// The element type of the input.
@@ -85,10 +85,8 @@ extension Input.Streaming {
     /// ```
     @inlinable
     public var remove: Input.Remove<Self> {
-        mutating get {
-            withUnsafeMutablePointer(to: &self) { ptr in
-                Input.Remove(ptr)
-            }
+        mutating _read {
+            yield Input.Remove(&self)
         }
     }
 }

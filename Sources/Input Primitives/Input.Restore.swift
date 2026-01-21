@@ -30,11 +30,12 @@ extension Input {
     /// All operations use typed throws per [API-ERR-001]:
     /// - `to(_:)` throws ``Error/invalidCheckpoint`` when the checkpoint
     ///   is out of bounds or was not created from this input instance
-    public struct Restore<Base: Input.`Protocol`> {
+    public struct Restore<Base: Input.`Protocol`>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafeMutablePointer<Base>
 
         @inlinable
+        @_lifetime(borrow base)
         init(_ base: UnsafeMutablePointer<Base>) {
             _base = base
         }

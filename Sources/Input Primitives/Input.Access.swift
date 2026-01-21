@@ -23,11 +23,12 @@ extension Input {
     /// All operations use typed throws per [API-ERR-001]:
     /// - `element(at:)` throws ``Error/outOfBounds(offset:count:)``
     ///   when the offset is invalid
-    public struct Access<Base: Input.Random> {
+    public struct Access<Base: Input.Random>: ~Copyable, ~Escapable {
         @usableFromInline
         let _base: UnsafePointer<Base>
 
         @inlinable
+        @_lifetime(borrow base)
         init(_ base: UnsafePointer<Base>) {
             _base = base
         }
@@ -49,6 +50,31 @@ extension Input {
     }
 }
 
-extension Input.Access {
-    public typealias Random = Input.Random
+// MARK: - Prefix Comparison
+
+extension Input.Access where Base.Element: Equatable {
+    /// Checks if remaining elements start with the given prefix.
+    ///
+    /// - Parameter prefix: Collection to compare against.
+    /// - Returns: `true` if remaining elements start with prefix.
+    /// - Complexity: O(prefix.count) without allocation.
+    @inlinable
+    public func starts<Prefix: Collection>(with prefix: Prefix) -> Bool
+    where Prefix.Element == Base.Element {
+        guard prefix.count <= _base.pointee.count else { return false }
+        for (offset, element) in prefix.enumerated() {
+            if _base.pointee[offset: offset] != element { return false }
+        }
+        return true
+    }
+
+    /// Checks if the input starts with the given element.
+    ///
+    /// - Parameter element: Element to compare against.
+    /// - Returns: `true` if remaining input starts with element.
+    /// - Complexity: O(1)
+    @inlinable
+    public func starts(with element: Base.Element) -> Bool {
+        !_base.pointee.isEmpty && _base.pointee[offset: 0] == element
+    }
 }

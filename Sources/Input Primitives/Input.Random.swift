@@ -23,8 +23,8 @@ extension Input {
     /// // Checked access via accessor
     /// let third = try input.access.element(at: 2)
     ///
-    /// // Prefix check without consumption
-    /// assert(input.starts(with: [0x48, 0x65]))  // "He"
+    /// // Prefix check without consumption (via accessor)
+    /// assert(input.access.starts(with: [0x48, 0x65]))  // "He"
     /// ```
     ///
     /// ## Totality
@@ -39,13 +39,13 @@ extension Input {
     ///       ↑
     /// Input.Protocol   ← checkpoint/restore
     ///       ↑
-    /// Input.Random     ← subscript(offset:), starts(with:)
+    /// Input.Random     ← subscript(offset:), access.starts(with:)
     /// ```
     ///
     /// ## Performance Requirements
     ///
     /// - ``subscript(offset:)`` must be O(1) for conforming types
-    /// - ``starts(with:)`` must be O(prefix.count) without allocation
+    /// - ``Input/Access/starts(with:)-1`` must be O(prefix.count) without allocation
     public protocol Random<Element>: Input.`Protocol` {
         /// Accesses the element at the given offset from current position.
         ///
@@ -75,39 +75,9 @@ extension Input.Random {
     /// ```
     @inlinable
     public var access: Input.Access<Self> {
-        withUnsafePointer(to: self) { ptr in
-            Input.Access(ptr)
+        mutating _read {
+            yield Input.Access(&self)
         }
     }
 }
 
-// MARK: - Prefix Comparison
-
-extension Input.Random where Element: Equatable {
-    /// Checks if remaining elements start with the given prefix.
-    ///
-    /// - Parameter prefix: Collection to compare against.
-    /// - Returns: `true` if remaining elements start with prefix.
-    /// - Complexity: O(prefix.count) without allocation.
-    @inlinable
-    public func starts<Prefix: Collection>(with prefix: Prefix) -> Bool
-    where Prefix.Element == Element {
-        guard prefix.count <= count else { return false }
-        var offset = 0
-        for element in prefix {
-            if self[offset: offset] != element { return false }
-            offset += 1
-        }
-        return true
-    }
-
-    /// Checks if the input starts with the given element.
-    ///
-    /// - Parameter element: Element to compare against.
-    /// - Returns: `true` if remaining input starts with element.
-    /// - Complexity: O(1)
-    @inlinable
-    public func starts(with element: Element) -> Bool {
-        first == element
-    }
-}

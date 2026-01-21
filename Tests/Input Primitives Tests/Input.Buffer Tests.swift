@@ -111,19 +111,19 @@ extension InputBufferTests.Test.Unit {
         #expect(buffer[offset: 4] == 50)
     }
 
-    @Test("starts(with:) prefix check")
+    @Test("access.starts(with:) prefix check")
     func startsWithPrefixCheck() {
-        let buffer = Input.Buffer([1, 2, 3, 4, 5])
-        #expect(buffer.starts(with: [1, 2, 3]))
-        #expect(!buffer.starts(with: [1, 2, 4]))
-        #expect(!buffer.starts(with: [1, 2, 3, 4, 5, 6]))
+        var buffer = Input.Buffer([1, 2, 3, 4, 5])
+        #expect(buffer.access.starts(with: [1, 2, 3]) == true)
+        #expect(buffer.access.starts(with: [1, 2, 4]) == false)
+        #expect(buffer.access.starts(with: [1, 2, 3, 4, 5, 6]) == false)
     }
 
-    @Test("starts(with:) single element")
+    @Test("access.starts(with:) single element")
     func startsWithSingleElement() {
-        let buffer = Input.Buffer([1, 2, 3])
-        #expect(buffer.starts(with: 1))
-        #expect(!buffer.starts(with: 2))
+        var buffer = Input.Buffer([1, 2, 3])
+        #expect(buffer.access.starts(with: 1) == true)
+        #expect(buffer.access.starts(with: 2) == false)
     }
 
     @Test("remaining returns self")
@@ -211,10 +211,10 @@ extension InputBufferTests.Test.EdgeCase {
         #expect(buffer.first == 1)
     }
 
-    @Test("starts(with:) empty prefix returns true")
+    @Test("access.starts(with:) empty prefix returns true")
     func startsWithEmptyPrefix() {
-        let buffer = Input.Buffer([1, 2, 3])
-        #expect(buffer.starts(with: [] as [Int]))
+        var buffer = Input.Buffer([1, 2, 3])
+        #expect(buffer.access.starts(with: []) == true)
     }
 
     @Test("offset access after partial consumption")
@@ -264,7 +264,7 @@ extension InputBufferTests.Test.Integration {
         var input = Input.Buffer(bytes)
 
         let cp = input.checkpoint
-        #expect(input.starts(with: [0x48, 0x65])) // "He"
+        #expect(input.access.starts(with: [0x48, 0x65]) == true) // "He"
         _ = try input.remove.first()
         _ = try input.remove.first()
         #expect(input.first == 0x6C) // 'l'
@@ -297,7 +297,7 @@ extension InputBufferTests.Test.Integration {
 
     @Test("access.element(at:) total accessor")
     func elementAtTotalAccessor() throws {
-        let input = Input.Buffer([1, 2, 3, 4, 5])
+        var input = Input.Buffer([1, 2, 3, 4, 5])
         #expect(try input.access.element(at: 0) == 1)
         #expect(try input.access.element(at: 4) == 5)
         #expect(throws: Input.Access<Input.Buffer<Int>>.Error.self) {

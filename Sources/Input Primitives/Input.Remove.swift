@@ -29,11 +29,12 @@ extension Input {
     /// - `first()` throws ``Error/empty`` when input is exhausted
     /// - `first(_:)` throws ``Error/insufficientElements(requested:available:)``
     ///   when requesting more elements than available
-    public struct Remove<Base: Input.Streaming> where Base: ~Copyable {
+    public struct Remove<Base: Input.Streaming>: ~Copyable, ~Escapable where Base: ~Copyable {
         @usableFromInline
         let _base: UnsafeMutablePointer<Base>
 
         @inlinable
+        @_lifetime(borrow base)
         init(_ base: UnsafeMutablePointer<Base>) {
             _base = base
         }

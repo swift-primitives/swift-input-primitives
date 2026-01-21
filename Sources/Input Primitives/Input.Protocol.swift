@@ -40,7 +40,7 @@ extension Input {
     ///       ↑
     /// Input.Protocol   ← adds checkpoint/restore for backtracking
     ///       ↑
-    /// Input.Random     ← adds subscript(offset:), starts(with:)
+    /// Input.Random     ← adds subscript(offset:), access.starts(with:)
     /// ```
     ///
     /// ## Abstracts Over
@@ -122,10 +122,8 @@ extension Input.`Protocol` {
     /// ```
     @inlinable
     public var restore: Input.Restore<Self> {
-        mutating get {
-            withUnsafeMutablePointer(to: &self) { ptr in
-                Input.Restore(ptr)
-            }
+        mutating _read {
+            yield Input.Restore(&self)
         }
     }
 }

@@ -242,7 +242,7 @@ extension InputBufferTests.Test.EdgeCase {
         var buffer = Input.Buffer([1, 2, 3])
         // Index<Element> is non-negative by construction, so we can't test -1
         // Test out-of-bounds checkpoint (position 100 for 3-element buffer)
-        let invalidCheckpoint = Input.Buffer<Int>.Checkpoint(__unchecked: 100)
+        let invalidCheckpoint: Input.Buffer<Int>.Checkpoint = 100
         #expect(throws: Input.Restore<Input.Buffer<Int>>.Error.invalidCheckpoint) {
             try buffer.restore.to(invalidCheckpoint)
         }

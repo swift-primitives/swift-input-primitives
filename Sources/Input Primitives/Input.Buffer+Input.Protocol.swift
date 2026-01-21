@@ -36,12 +36,12 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     public var checkpoint: Checkpoint {
-        Checkpoint(__unchecked: position)
+        Checkpoint(__unchecked: (), position: position)
     }
 
     @inlinable
     public var checkpointRange: ClosedRange<Checkpoint> {
-        Checkpoint(__unchecked: 0)...Checkpoint(__unchecked: totalCount)
+        Checkpoint(__unchecked: (), position: 0)...Checkpoint(__unchecked: (), position: totalCount)
     }
 
     // MARK: - Unchecked Primitives

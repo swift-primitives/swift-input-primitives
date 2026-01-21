@@ -11,6 +11,11 @@ extension Input.Access {
     /// Extends ``Input/Protocol`` with offset-based subscript and prefix
     /// comparison, enabling efficient lookahead without consumption.
     ///
+    /// ## Totality
+    ///
+    /// - `subscript(offset:)` is unchecked per stdlib Collection subscript convention
+    /// - `element(at:)` provides total access with typed throws
+    ///
     /// ## Protocol Hierarchy
     ///
     /// ```
@@ -48,10 +53,35 @@ extension Input.Access {
     public protocol Random<Element>: Input.`Protocol` {
         /// Accesses the element at the given offset from current position.
         ///
+        /// This is unchecked per stdlib Collection subscript convention.
+        /// For total access, use ``element(at:)``.
+        ///
         /// - Parameter offset: Offset from current position (0-indexed).
         /// - Precondition: `offset >= 0` and `offset < count`.
         /// - Complexity: O(1)
         subscript(offset offset: Int) -> Element { get }
+
+        /// Accesses the element at the given offset with bounds checking.
+        ///
+        /// - Parameter offset: Offset from current position (0-indexed).
+        /// - Returns: The element at the offset.
+        /// - Throws: ``Input/Error/insufficientElements(requested:available:)``
+        ///   if `offset < 0` or `offset >= count`.
+        /// - Complexity: O(1)
+        func element(at offset: Int) throws(Input.Error) -> Element
+    }
+}
+
+// MARK: - Default Implementation
+
+extension Input.Access.Random {
+    /// Default implementation of total element access.
+    @inlinable
+    public func element(at offset: Int) throws(Input.Error) -> Element {
+        guard offset >= 0 && offset < count else {
+            throw .insufficientElements(requested: offset + 1, available: count)
+        }
+        return self[offset: offset]
     }
 }
 

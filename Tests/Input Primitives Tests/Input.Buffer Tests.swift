@@ -54,51 +54,51 @@ extension InputBufferTests.Test.Unit {
     }
 
     @Test("removeFirst consumes element")
-    func removeFirstConsumesElement() {
+    func removeFirstConsumesElement() throws {
         var buffer = Input.Buffer([1, 2, 3])
-        let first = buffer.removeFirst()
+        let first = try buffer.removeFirst()
         #expect(first == 1)
         #expect(buffer.count == 2)
         #expect(buffer.first == 2)
     }
 
     @Test("removeFirst(n) advances by n elements")
-    func removeFirstNAdvances() {
+    func removeFirstNAdvances() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        buffer.removeFirst(3)
+        try buffer.removeFirst(3)
         #expect(buffer.count == 2)
         #expect(buffer.first == 4)
     }
 
     @Test("consumedCount tracks consumption")
-    func consumedCountTracksConsumption() {
+    func consumedCountTracksConsumption() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
         #expect(buffer.consumedCount == 0)
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
         #expect(buffer.consumedCount == 1)
-        buffer.removeFirst(2)
+        try buffer.removeFirst(2)
         #expect(buffer.consumedCount == 3)
     }
 
     @Test("checkpoint returns current position")
-    func checkpointReturnsPosition() {
+    func checkpointReturnsPosition() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
         let cp = buffer.checkpoint
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
         #expect(buffer.first == 3)
-        buffer.restore(to: cp)
+        try buffer.restore(to: cp)
         #expect(buffer.first == 2)
     }
 
     @Test("checkpoint and restore roundtrip")
-    func checkpointRestoreRoundtrip() {
+    func checkpointRestoreRoundtrip() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
         let cp = buffer.checkpoint
-        _ = buffer.removeFirst()
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
+        _ = try buffer.removeFirst()
         #expect(buffer.count == 3)
-        buffer.restore(to: cp)
+        try buffer.restore(to: cp)
         #expect(buffer.count == 5)
         #expect(buffer.first == 1)
     }
@@ -127,26 +127,36 @@ extension InputBufferTests.Test.Unit {
     }
 
     @Test("remaining returns self")
-    func remainingReturnsSelf() {
+    func remainingReturnsSelf() throws {
         var buffer = Input.Buffer([1, 2, 3])
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
         let remaining = buffer.remaining
         #expect(remaining.count == buffer.count)
         #expect(remaining.first == buffer.first)
     }
 
-    @Test("popFirst returns nil when empty")
-    func popFirstReturnsNilWhenEmpty() {
+    @Test("removeFirst throws when empty")
+    func removeFirstThrowsWhenEmpty() {
         var buffer = Input.Buffer<Int>([])
-        #expect(buffer.popFirst() == nil)
+        #expect(throws: Input.Error.empty) {
+            try buffer.removeFirst()
+        }
+    }
+
+    @Test("try? removeFirst returns nil when empty")
+    func tryRemoveFirstReturnsNilWhenEmpty() {
+        var buffer = Input.Buffer<Int>([])
+        let result = try? buffer.removeFirst()
+        #expect(result == nil)
         #expect(buffer.isEmpty)
         #expect(buffer.count == 0)
     }
 
-    @Test("popFirst consumes element")
-    func popFirstConsumesElement() {
+    @Test("try? removeFirst consumes element")
+    func tryRemoveFirstConsumesElement() {
         var buffer = Input.Buffer([1, 2, 3])
-        #expect(buffer.popFirst() == 1)
+        let result = try? buffer.removeFirst()
+        #expect(result == 1)
         #expect(buffer.first == 2)
         #expect(buffer.count == 2)
     }
@@ -156,47 +166,47 @@ extension InputBufferTests.Test.Unit {
 
 extension InputBufferTests.Test.EdgeCase {
     @Test("single element buffer")
-    func singleElementBuffer() {
+    func singleElementBuffer() throws {
         var buffer = Input.Buffer([42])
         #expect(!buffer.isEmpty)
         #expect(buffer.first == 42)
         let cp = buffer.checkpoint
-        #expect(buffer.removeFirst() == 42)
+        #expect(try buffer.removeFirst() == 42)
         #expect(buffer.isEmpty)
-        buffer.restore(to: cp)
+        try buffer.restore(to: cp)
         #expect(buffer.first == 42)
     }
 
     @Test("restore to checkpoint at end")
-    func restoreToCheckpointAtEnd() {
+    func restoreToCheckpointAtEnd() throws {
         var buffer = Input.Buffer([1, 2])
-        _ = buffer.removeFirst()
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
+        _ = try buffer.removeFirst()
         let cpAtEnd = buffer.checkpoint
         #expect(buffer.isEmpty)
-        buffer.restore(to: cpAtEnd)
+        try buffer.restore(to: cpAtEnd)
         #expect(buffer.isEmpty)
     }
 
     @Test("nested checkpoint restore")
-    func nestedCheckpointRestore() {
+    func nestedCheckpointRestore() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
         let cp1 = buffer.checkpoint
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
         let cp2 = buffer.checkpoint
-        _ = buffer.removeFirst()
-        _ = buffer.removeFirst()
+        _ = try buffer.removeFirst()
+        _ = try buffer.removeFirst()
         #expect(buffer.first == 4)
-        buffer.restore(to: cp2)
+        try buffer.restore(to: cp2)
         #expect(buffer.first == 2)
-        buffer.restore(to: cp1)
+        try buffer.restore(to: cp1)
         #expect(buffer.first == 1)
     }
 
     @Test("removeFirst(0) is no-op")
-    func removeFirstZeroIsNoop() {
+    func removeFirstZeroIsNoop() throws {
         var buffer = Input.Buffer([1, 2, 3])
-        buffer.removeFirst(0)
+        try buffer.removeFirst(0)
         #expect(buffer.count == 3)
         #expect(buffer.first == 1)
     }
@@ -208,21 +218,40 @@ extension InputBufferTests.Test.EdgeCase {
     }
 
     @Test("offset access after partial consumption")
-    func offsetAccessAfterConsumption() {
+    func offsetAccessAfterConsumption() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        buffer.removeFirst(2)
+        try buffer.removeFirst(2)
         #expect(buffer[offset: 0] == 3)
         #expect(buffer[offset: 2] == 5)
     }
 
     @Test("consumedCount preserved across restore")
-    func consumedCountAfterRestore() {
+    func consumedCountAfterRestore() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
         let cp = buffer.checkpoint
-        buffer.removeFirst(3)
+        try buffer.removeFirst(3)
         #expect(buffer.consumedCount == 3)
-        buffer.restore(to: cp)
+        try buffer.restore(to: cp)
         #expect(buffer.consumedCount == 0)
+    }
+
+    @Test("removeFirst(n) throws when n > count")
+    func removeFirstNThrowsWhenInsufficient() {
+        var buffer = Input.Buffer([1, 2, 3])
+        #expect(throws: Input.Error.insufficientElements(requested: 5, available: 3)) {
+            try buffer.removeFirst(5)
+        }
+    }
+
+    @Test("restore throws for invalid checkpoint")
+    func restoreThrowsForInvalidCheckpoint() {
+        var buffer = Input.Buffer([1, 2, 3])
+        #expect(throws: Input.Error.invalidCheckpoint) {
+            try buffer.restore(to: -1)
+        }
+        #expect(throws: Input.Error.invalidCheckpoint) {
+            try buffer.restore(to: 100)
+        }
     }
 }
 
@@ -230,17 +259,17 @@ extension InputBufferTests.Test.EdgeCase {
 
 extension InputBufferTests.Test.Integration {
     @Test("byte parsing scenario")
-    func byteParsingScenario() {
+    func byteParsingScenario() throws {
         let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F] // "Hello"
         var input = Input.Buffer(bytes)
 
         let cp = input.checkpoint
         #expect(input.starts(with: [0x48, 0x65])) // "He"
-        _ = input.removeFirst()
-        _ = input.removeFirst()
+        _ = try input.removeFirst()
+        _ = try input.removeFirst()
         #expect(input.first == 0x6C) // 'l'
 
-        input.restore(to: cp)
+        try input.restore(to: cp)
         #expect(input.first == 0x48) // 'H'
     }
 
@@ -255,14 +284,24 @@ extension InputBufferTests.Test.Integration {
     }
 
     @Test("complete consumption")
-    func completeConsumption() {
+    func completeConsumption() throws {
         var input = Input.Buffer([1, 2, 3])
         var consumed: [Int] = []
         while !input.isEmpty {
-            consumed.append(input.removeFirst())
+            consumed.append(try input.removeFirst())
         }
         #expect(consumed == [1, 2, 3])
         #expect(input.isEmpty)
         #expect(input.consumedCount == 3)
+    }
+
+    @Test("element(at:) total accessor")
+    func elementAtTotalAccessor() throws {
+        let input = Input.Buffer([1, 2, 3, 4, 5])
+        #expect(try input.element(at: 0) == 1)
+        #expect(try input.element(at: 4) == 5)
+        #expect(throws: Input.Error.self) {
+            try input.element(at: 10)
+        }
     }
 }

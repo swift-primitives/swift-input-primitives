@@ -12,6 +12,15 @@ extension Input {
     /// enabling parser combinators like `OneOf`, `Peek`, and `Not` to try
     /// alternatives and restore position on failure.
     ///
+    /// ## Totality
+    ///
+    /// All operations are total per [API-IMPL-003]:
+    /// - `restore(to:)` throws for invalid checkpoints
+    /// - `removeFirst(_:)` throws when requesting more elements than available
+    ///
+    /// For unchecked access in performance-critical paths, use the
+    /// `__unchecked` variants.
+    ///
     /// ## Protocol Hierarchy
     ///
     /// ```
@@ -40,11 +49,11 @@ extension Input {
     /// let checkpoint = input.checkpoint
     ///
     /// // Try to match something
-    /// let a = input.removeFirst()  // 1
-    /// let b = input.removeFirst()  // 2
+    /// let a = try input.removeFirst()  // 1
+    /// let b = try input.removeFirst()  // 2
     ///
     /// // Failed, restore position
-    /// input.restore(to: checkpoint)
+    /// try input.restore(to: checkpoint)
     /// assert(input.first == 1)  // Back at start
     /// ```
     public protocol `Protocol`<Element>: Streaming where Self: Copyable {
@@ -66,14 +75,16 @@ extension Input {
         /// Restores the input to a previously saved checkpoint.
         ///
         /// - Parameter checkpoint: A checkpoint obtained from ``checkpoint``.
-        /// - Precondition: The checkpoint was created from this input instance.
-        mutating func restore(to checkpoint: Checkpoint)
+        /// - Throws: ``Input/Error/invalidCheckpoint`` if the checkpoint is
+        ///   out of bounds or was not created from this input instance.
+        mutating func restore(to checkpoint: Checkpoint) throws(Input.Error)
 
         /// Removes and discards the first `n` elements.
         ///
         /// - Parameter n: The number of elements to skip.
-        /// - Precondition: `n >= 0` and `n <= count`.
-        mutating func removeFirst(_ n: Int)
+        /// - Throws: ``Input/Error/insufficientElements(requested:available:)``
+        ///   if `n > count`.
+        mutating func removeFirst(_ n: Int) throws(Input.Error)
 
         /// The remaining input as the same type (for composability).
         ///
@@ -90,5 +101,30 @@ extension Input.`Protocol` {
     @inlinable
     public var remaining: Self {
         self
+    }
+}
+
+// MARK: - Unchecked Access
+
+extension Input.`Protocol` {
+    /// Restores to checkpoint without validation.
+    ///
+    /// Use in performance-critical paths where the checkpoint is known valid.
+    ///
+    /// - Precondition: `checkpoint` was created from this input instance
+    ///   and represents a valid position.
+    @inlinable
+    public mutating func restore(__unchecked: Void, to checkpoint: Checkpoint) {
+        try! restore(to: checkpoint)
+    }
+
+    /// Removes `n` elements without bounds checking.
+    ///
+    /// Use in performance-critical paths where `n <= count` is known.
+    ///
+    /// - Precondition: `n >= 0` and `n <= count`.
+    @inlinable
+    public mutating func removeFirst(__unchecked: Void, _ n: Int) {
+        try! removeFirst(n)
     }
 }

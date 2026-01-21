@@ -19,6 +19,15 @@ extension Input {
     /// - Large file parsing (where buffering is expensive)
     /// - Committed-choice parsing (where backtracking is not needed)
     ///
+    /// ## Totality
+    ///
+    /// All operations are total per [API-IMPL-003]:
+    /// - `isEmpty` and `first` are inherently total
+    /// - `removeFirst()` uses typed throws for empty input
+    ///
+    /// For unchecked access in performance-critical paths, use
+    /// `removeFirst(__unchecked:)`.
+    ///
     /// ## Protocol Hierarchy
     ///
     /// ```
@@ -42,22 +51,26 @@ extension Input {
 
         /// Removes and returns the first element.
         ///
-        /// - Precondition: `!isEmpty`
         /// - Returns: The first element.
+        /// - Throws: ``Input/Error/empty`` if the input is empty.
         @discardableResult
-        mutating func removeFirst() -> Element
+        mutating func removeFirst() throws(Input.Error) -> Element
     }
 }
 
-// MARK: - Total Consumption
+// MARK: - Unchecked Access
 
 extension Input.Streaming {
-    /// Removes and returns the first element, or `nil` if the input is empty.
+    /// Removes and returns the first element without bounds checking.
     ///
-    /// This is the total variant of ``removeFirst()``.
+    /// Use this in performance-critical paths where you have already
+    /// verified `!isEmpty`.
+    ///
+    /// - Precondition: `!isEmpty`
+    /// - Returns: The first element.
     @inlinable
-    public mutating func popFirst() -> Element? {
-        guard !isEmpty else { return nil }
-        return removeFirst()
+    public mutating func removeFirst(__unchecked: Void) -> Element {
+        try! removeFirst()
     }
 }
+

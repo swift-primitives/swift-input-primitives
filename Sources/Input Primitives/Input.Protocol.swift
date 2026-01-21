@@ -43,6 +43,16 @@ extension Input {
     /// Input.Random     ← adds subscript(offset:), access.starts(with:)
     /// ```
     ///
+    /// ## Capability Factoring
+    ///
+    /// This protocol defines the core checkpoint contract without requiring
+    /// `Copyable`. The ``remaining`` property is available only when
+    /// `Self: Copyable`, as it returns a copy of the cursor.
+    ///
+    /// This factoring allows move-only cursor types (e.g., linear cursors
+    /// over unique storage) to conform while preserving checkpoint/restore
+    /// semantics.
+    ///
     /// ## Abstracts Over
     ///
     /// - ``Input/Slice`` for zero-copy collection cursors
@@ -53,7 +63,7 @@ extension Input {
     /// All operations should be O(1) and non-allocating for conforming types.
     /// The protocol does not require random access - only forward iteration
     /// with the ability to save and restore positions.
-    public protocol `Protocol`<Element>: Streaming where Self: Copyable {
+    public protocol `Protocol`<Element>: Streaming {
         /// The checkpoint type for position-based backtracking.
         ///
         /// Typically a lightweight value like `Int` or an index type.
@@ -68,12 +78,6 @@ extension Input {
         /// The checkpoint can be used with `restore.to(_:)` to backtrack.
         /// This must be O(1) and should not allocate.
         var checkpoint: Checkpoint { get }
-
-        /// The remaining input as the same type (for composability).
-        ///
-        /// Default implementation returns `self`. Override for types
-        /// that need conversion (e.g., Array → ArraySlice).
-        var remaining: Self { get }
 
         // MARK: - Unchecked Primitives
 
@@ -95,10 +99,17 @@ extension Input {
     }
 }
 
-// MARK: - Default Implementations
+// MARK: - Copyable Capability (remaining)
 
-extension Input.`Protocol` {
-    /// Default remaining implementation returns self.
+extension Input.`Protocol` where Self: Copyable {
+    /// The remaining input as a copy of the cursor.
+    ///
+    /// Returns a copy of `self`, preserving the current position.
+    /// Available only when `Self: Copyable`.
+    ///
+    /// For composability with APIs that consume input values.
+    ///
+    /// - Complexity: O(1) for cursor types (copies position, not elements).
     @inlinable
     public var remaining: Self {
         self

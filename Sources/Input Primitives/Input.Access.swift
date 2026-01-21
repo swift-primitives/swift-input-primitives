@@ -57,7 +57,9 @@ extension Input.Access where Base.Element: Equatable {
     ///
     /// - Parameter prefix: Collection to compare against.
     /// - Returns: `true` if remaining elements start with prefix.
-    /// - Complexity: O(prefix.count) without allocation.
+    /// - Complexity: O(*n*) where *n* is the length of `prefix`. Note that
+    ///   `prefix.count` is also called, which is O(1) for `RandomAccessCollection`
+    ///   but O(*n*) for other collections.
     @inlinable
     public func starts<Prefix: Collection>(with prefix: Prefix) -> Bool
     where Prefix.Element == Base.Element {

@@ -63,9 +63,39 @@ extension Input {
         ///   - base: The collection to wrap.
         ///   - startIndex: The starting index.
         ///   - endIndex: The ending index.
+        /// - Throws: ``Error/invalidBounds(startIndex:endIndex:)`` if
+        ///   `startIndex > endIndex`.
+        @inlinable
+        public init(
+            base: Base,
+            startIndex: Base.Index,
+            endIndex: Base.Index
+        ) throws(__InputSliceError) {
+            guard startIndex <= endIndex else {
+                throw .invalidBounds(
+                    startIndex: base.distance(from: base.startIndex, to: startIndex),
+                    endIndex: base.distance(from: base.startIndex, to: endIndex)
+                )
+            }
+            self.base = base
+            self.startIndex = startIndex
+            self.endIndex = endIndex
+        }
+
+        /// Creates a slice cursor with explicit bounds without validation.
+        ///
+        /// - Parameters:
+        ///   - base: The collection to wrap.
+        ///   - startIndex: The starting index.
+        ///   - endIndex: The ending index.
         /// - Precondition: `startIndex <= endIndex` and both are valid indices.
         @inlinable
-        public init(base: Base, startIndex: Base.Index, endIndex: Base.Index) {
+        public init(
+            __unchecked: Void,
+            base: Base,
+            startIndex: Base.Index,
+            endIndex: Base.Index
+        ) {
             self.base = base
             self.startIndex = startIndex
             self.endIndex = endIndex

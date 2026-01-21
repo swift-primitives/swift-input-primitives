@@ -18,12 +18,14 @@ let package = Package(
         ),
     ],
     dependencies: [
-        // Tier 0: No primitive dependencies
+        .package(path: "../swift-index-primitives"),
     ],
     targets: [
         .target(
             name: "Input Primitives",
-            dependencies: []
+            dependencies: [
+                .product(name: "Index Primitives", package: "swift-index-primitives"),
+            ]
         ),
         .testTarget(
             name: "Input Primitives Tests",

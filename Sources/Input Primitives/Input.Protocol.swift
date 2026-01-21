@@ -66,9 +66,12 @@ extension Input {
     public protocol `Protocol`<Element>: Streaming, ~Copyable {
         /// The checkpoint type for position-based backtracking.
         ///
-        /// Typically a lightweight value like `Int` or an index type.
-        /// Must be `Sendable` for use in concurrent parsing contexts.
-        associatedtype Checkpoint: Sendable
+        /// Must be `Sendable` for concurrent parsing and `Comparable`
+        /// for range-based validation.
+        ///
+        /// For ``Input/Buffer``, this is `Index<Element>` from index-primitives.
+        /// For ``Input/Slice``, this is `Base.Index`.
+        associatedtype Checkpoint: Sendable & Comparable
 
         /// The number of elements remaining.
         var count: Int { get }
@@ -79,23 +82,38 @@ extension Input {
         /// This must be O(1) and should not allocate.
         var checkpoint: Checkpoint { get }
 
-        // MARK: - Unchecked Primitives
-
-        /// Checks if a checkpoint is valid for this input.
+        /// The range of valid checkpoint positions.
         ///
-        /// - Parameter checkpoint: The checkpoint to validate.
-        /// - Returns: `true` if the checkpoint can be restored to.
-        func __isValidCheckpoint(_ checkpoint: Checkpoint) -> Bool
+        /// Used by the default ``__isValidCheckpoint(_:)`` implementation.
+        /// Conformers provide bounds; validation logic is centralized.
+        var checkpointRange: ClosedRange<Checkpoint> { get }
+
+        // MARK: - Unchecked Primitives
 
         /// Restores to a checkpoint without validation.
         ///
-        /// - Precondition: `__isValidCheckpoint(checkpoint)` is true.
+        /// - Precondition: `checkpointRange.contains(checkpoint)` is true.
         mutating func __restoreUnchecked(to checkpoint: Checkpoint)
 
         /// Removes `count` elements without checking.
         ///
         /// - Precondition: `count >= 0 && count <= self.count`
         mutating func __removeFirstUnchecked(_ count: Int)
+    }
+}
+
+// MARK: - Default Checkpoint Validation
+
+extension Input.`Protocol` where Self: ~Copyable {
+    /// Checks if a checkpoint is valid for this input.
+    ///
+    /// Default implementation uses ``checkpointRange`` for validation.
+    ///
+    /// - Parameter checkpoint: The checkpoint to validate.
+    /// - Returns: `true` if the checkpoint can be restored to.
+    @inlinable
+    public func __isValidCheckpoint(_ checkpoint: Checkpoint) -> Bool {
+        checkpointRange.contains(checkpoint)
     }
 }
 

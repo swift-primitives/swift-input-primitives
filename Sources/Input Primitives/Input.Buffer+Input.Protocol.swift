@@ -6,7 +6,13 @@
 //
 
 extension Input.Buffer: Input.`Protocol` {
-    public typealias Checkpoint = Int
+    /// Checkpoint type using phantom-typed `Index<Element>` from index-primitives.
+    ///
+    /// This provides:
+    /// - Type safety: `Index<Int>` ≠ `Index<String>`
+    /// - Non-negative guarantee: from `Affine.Discrete.Position`
+    /// - Sendable + Comparable conformance
+    public typealias Checkpoint = Index<Element>
 
     /// The total number of elements in the storage.
     @usableFromInline
@@ -29,7 +35,14 @@ extension Input.Buffer: Input.`Protocol` {
     }
 
     @inlinable
-    public var checkpoint: Checkpoint { position }
+    public var checkpoint: Checkpoint {
+        Checkpoint(__unchecked: position)
+    }
+
+    @inlinable
+    public var checkpointRange: ClosedRange<Checkpoint> {
+        Checkpoint(__unchecked: 0)...Checkpoint(__unchecked: totalCount)
+    }
 
     // MARK: - Unchecked Primitives
 
@@ -47,12 +60,7 @@ extension Input.Buffer: Input.`Protocol` {
     }
 
     @inlinable
-    public func __isValidCheckpoint(_ checkpoint: Checkpoint) -> Bool {
-        checkpoint >= 0 && checkpoint <= totalCount
-    }
-
-    @inlinable
     public mutating func __restoreUnchecked(to checkpoint: Checkpoint) {
-        position = checkpoint
+        position = checkpoint.position.rawValue
     }
 }

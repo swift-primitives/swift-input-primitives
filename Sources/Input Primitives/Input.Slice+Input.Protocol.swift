@@ -7,6 +7,8 @@
 
 extension Input.Slice: Input.`Protocol` {
     public typealias Element = Base.Element
+
+    /// Checkpoint type is the collection's native index type.
     public typealias Checkpoint = Base.Index
 
     @inlinable
@@ -29,6 +31,13 @@ extension Input.Slice: Input.`Protocol` {
         startIndex
     }
 
+    @inlinable
+    public var checkpointRange: ClosedRange<Checkpoint> {
+        // Valid range: from base start to our endIndex
+        // (can restore to any position we've seen, up to end)
+        base.startIndex...endIndex
+    }
+
     // MARK: - Unchecked Primitives
 
     @inlinable
@@ -42,13 +51,6 @@ extension Input.Slice: Input.`Protocol` {
     @inlinable
     public mutating func __removeFirstUnchecked(_ count: Int) {
         startIndex = base.index(startIndex, offsetBy: count)
-    }
-
-    @inlinable
-    public func __isValidCheckpoint(_ checkpoint: Checkpoint) -> Bool {
-        // A valid checkpoint must be >= base.startIndex and <= endIndex
-        // (can restore to end position, which means empty).
-        checkpoint >= base.startIndex && checkpoint <= endIndex
     }
 
     @inlinable

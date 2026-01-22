@@ -284,6 +284,74 @@ For `Input.Streaming`, we kept `popFirst()` because it matches stdlib semantics 
 
 ---
 
+## Semantic Naming vs Safety Qualifiers
+
+**Date**: 2026-01-21
+
+**Context**: Refactoring Input protocol primitives from `__restoreUnchecked`, `__removeFirstUnchecked` to `setPosition`, `advance`.
+
+### The Category Error in "Unchecked" Naming
+
+The `__unchecked` naming pattern describes what a method *doesn't* do rather than what it *does*. This is a category error. Method names should be positive descriptions of behavior, not negative assertions about absent behavior.
+
+`__restoreUnchecked(to:)` tells you: "this is like restore but without checking." It doesn't tell you what it actually does. `setPosition(to:)` tells you exactly what happens: the cursor position is set. The validation absence is an implementation detail, not the method's identity.
+
+This extends to all the primitives: `__removeFirstUnchecked()` becomes `advance()`, `__isValidCheckpoint(_:)` becomes `isValid(_:)`. Each new name describes the physical operation performed, not the safety guarantees it lacks.
+
+### The API vs Primitive Distinction
+
+The session reframed the distinction entirely. The old mental model was "checked vs unchecked"—two versions of the same operation with different safety guarantees. The new mental model is "API vs primitive"—two different conceptual layers.
+
+| Layer | Purpose | Example |
+|-------|---------|---------|
+| API | What the user wants | `restore.to(checkpoint)` — restore safely |
+| Primitive | How the cursor moves | `setPosition(to:)` — set internal position |
+
+These aren't variations of the same operation. The API is a high-level intent; the primitive is a low-level mechanism. The accessor (`restore.to()`) provides validation then calls the primitive. Neither is "unchecked"—one validates, one doesn't need to because it's an implementation detail.
+
+### The `__unchecked` Principle
+
+`__unchecked` should only appear when breaking overloads. If two methods have the same semantic meaning but different safety guarantees, `__unchecked` disambiguates. But if methods have different semantic meanings—like "restore to checkpoint safely" vs "set cursor position"—they should have different names describing those meanings.
+
+This principle eliminates safety qualifiers from method names entirely when the methods aren't true overloads. The Input protocol primitives aren't overloads of the accessors; they're implementation details with their own semantic identity.
+
+**Applies to**: All Input protocol primitive methods.
+
+---
+
+## The Input Primitives Value Proposition
+
+**Date**: 2026-01-21
+
+**Context**: Understanding why swift-input-primitives exists and its relationship to swift-deque-primitives.
+
+### The Abstraction Boundary
+
+Input primitives define *what it means to consume a sequence with backtracking*, without prescribing data structures.
+
+The three-tier protocol hierarchy (`Input.Streaming` → `Input.Protocol` → `Input.Access.Random`) factors capabilities:
+- Streaming: forward-only consumption (`advance`, `isEmpty`, `first`)
+- Protocol: checkpoint/restore for backtracking (`checkpoint`, `setPosition`, `isValid`)
+- Random: O(1) lookahead (`subscript(offset:)`)
+
+Each tier enables different use cases. Network streams need only Streaming. Trial parsers need Protocol. Efficient lookahead parsers need Random. The factoring lets types conform to exactly the capabilities they can support.
+
+### Deque as Consumer
+
+Deque's conformance to all three Input protocols transforms it from "just a container" to "a resumable input source." You can parse from a Deque with checkpoint/restore semantics, treating it as a buffering layer for streaming data.
+
+The Checkpoint stores `(head: Int, count: Int)`—the ring buffer's logical position. Restoring is O(1): set head and count back. This is possible because Deque already tracks these values for its own operations; the Input conformance just exposes them.
+
+### The Complexity Was Necessary
+
+The initial concern—"getting quite complex due to the protocols involved"—resolves when understanding that the complexity serves real purposes. Different checkpoint representations (Int for Buffer, Base.Index for Slice, (head, count) for Deque), typed throws per operation category, three-tier capability hierarchy—each serves a distinct use case.
+
+The protocol complexity is the minimum viable abstraction for "consumable cursors with backtracking over arbitrary backends." Simplifying further would lose capabilities that real parsers need.
+
+**Applies to**: All Input protocol design decisions.
+
+---
+
 ## Topics
 
 ### Related Documents

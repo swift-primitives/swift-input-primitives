@@ -68,7 +68,7 @@ extension Input {
             /// - Parameter offset: Offset from current position (0-indexed).
             /// - Precondition: `offset >= 0` and `offset < count`.
             /// - Complexity: O(1)
-            subscript(offset offset: Int) -> Element { get }
+            subscript(offset offset: Index<Element>.Offset) -> Element { get }
         }
     }
 }
@@ -105,10 +105,10 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     /// - Throws: ``Input/Access/Error/outOfBounds(offset:count:)`` if the offset
     ///   is negative or exceeds the remaining element count.
     @inlinable
-    public func element(at offset: Int) throws(Input.Access.Error) -> Base.Element {
+    public func element(at offset: Index<Base.Element>.Offset) throws(Input.Access.Error) -> Base.Element {
         let count = unsafe base.pointee.count
-        guard offset >= 0 && offset < count else {
-            throw .outOfBounds(offset: offset, count: count)
+        guard offset.rawValue >= 0 && offset.rawValue < count else {
+            throw .outOfBounds(offset: offset.rawValue, count: count)
         }
         return unsafe base.pointee[offset: offset]
     }
@@ -127,7 +127,7 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     where Prefix.Element == Base.Element {
         guard unsafe prefix.count <= base.pointee.count else { return false }
         for (offset, element) in prefix.enumerated() {
-            if unsafe base.pointee[offset: offset] != element { return false }
+            if unsafe base.pointee[offset: Index<Base.Element>.Offset(offset)] != element { return false }
         }
         return true
     }
@@ -139,6 +139,6 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     /// - Complexity: O(1)
     @inlinable
     public func starts(with element: Base.Element) -> Bool {
-        unsafe !base.pointee.isEmpty && base.pointee[offset: 0] == element
+        unsafe !base.pointee.isEmpty && base.pointee[offset: Index<Base.Element>.Offset(0)] == element
     }
 }

@@ -7,7 +7,7 @@
 
 extension Input.Buffer: Input.Access.Random {
     @inlinable
-    public subscript(offset offset: Int) -> Element {
-        storage[position + offset]
+    public subscript(offset offset: Index<Element>.Offset) -> Element {
+        storage[(position + offset)!]
     }
 }

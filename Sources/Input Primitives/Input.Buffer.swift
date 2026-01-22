@@ -40,7 +40,7 @@ extension Input {
 
         /// The current position in the storage.
         @usableFromInline
-        var position: Int
+        var position: Index<Element>
 
         /// Creates a buffer cursor over the given array.
         ///
@@ -52,7 +52,7 @@ extension Input {
                 count: elements.count,
                 initializingWith: { elements[$0] }
             )
-            self.position = 0
+            self.position = .zero
         }
 
         /// Creates a buffer cursor from a sequence.
@@ -66,7 +66,7 @@ extension Input {
                 count: elements.count,
                 initializingWith: { elements[$0] }
             )
-            self.position = 0
+            self.position = .zero
         }
 
         /// Creates a buffer cursor with repeating element.
@@ -81,7 +81,7 @@ extension Input {
                 count: Swift.max(0, count),
                 initializingWith: { _ in element }
             )
-            self.position = 0
+            self.position = .zero
         }
     }
 }

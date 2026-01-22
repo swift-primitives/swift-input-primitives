@@ -7,7 +7,7 @@
 
 extension Input.Slice: Input.Access.Random where Base: Swift.RandomAccessCollection {
     @inlinable
-    public subscript(offset offset: Int) -> Element {
-        base[base.index(startIndex, offsetBy: offset)]
+    public subscript(offset offset: Index<Element>.Offset) -> Element {
+        base[base.index(startIndex, offsetBy: offset.rawValue)]
     }
 }

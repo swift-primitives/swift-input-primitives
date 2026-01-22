@@ -16,17 +16,17 @@ extension Input.Buffer: Input.`Protocol` {
 
     /// The total number of elements in the storage.
     @usableFromInline
-    var totalCount: Int { storage.count }
+    var totalCount: Index<Element>.Count { storage.count }
 
     @inlinable
-    public var count: Int { totalCount - position }
+    public var count: Int { totalCount.rawValue - position.position.rawValue }
 
     @inlinable
     public var isEmpty: Bool { position >= totalCount }
 
     /// Number of elements consumed since construction.
     @inlinable
-    public var consumedCount: Int { position }
+    public var consumedCount: Int { position.position.rawValue }
 
     @inlinable
     public var first: Element? {
@@ -35,13 +35,11 @@ extension Input.Buffer: Input.`Protocol` {
     }
 
     @inlinable
-    public var checkpoint: Checkpoint {
-        Checkpoint(__unchecked: (), position: position)
-    }
+    public var checkpoint: Checkpoint { position }
 
     @inlinable
     public var checkpointRange: ClosedRange<Checkpoint> {
-        Checkpoint(__unchecked: (), position: 0)...Checkpoint(__unchecked: (), position: totalCount)
+        .zero...Checkpoint(totalCount)
     }
 
     // MARK: - Primitives
@@ -50,17 +48,17 @@ extension Input.Buffer: Input.`Protocol` {
     @discardableResult
     public mutating func advance() -> Element {
         let element = storage[position]
-        position += 1
+        position = (position + 1)!
         return element
     }
 
     @inlinable
     public mutating func advance(by count: Int) {
-        position += count
+        position = (position + Index<Element>.Offset(count))!
     }
 
     @inlinable
     public mutating func setPosition(to checkpoint: Checkpoint) {
-        position = checkpoint.position.rawValue
+        position = checkpoint
     }
 }

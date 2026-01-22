@@ -59,7 +59,7 @@ extension Input {
         ///
         /// - Parameter sequence: The sequence to copy into the buffer.
         @inlinable
-        public init<S: Sequence>(_ sequence: S) where S.Element == Element {
+        public init<S: Swift.Sequence>(_ sequence: S) where S.Element == Element {
             let elements = Swift.Array(sequence)
             self.storage = Array<Element>.Bounded(
                 __unchecked: (),

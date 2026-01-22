@@ -33,7 +33,7 @@ extension Input {
     /// input.restore(to: checkpoint)
     /// assert(input.first == 0x48)
     /// ```
-    public struct Slice<Base: Collection>: Sendable
+    public struct Slice<Base: Swift.Collection>: Sendable
     where Base: Sendable, Base.Index: Sendable {
         /// The underlying collection.
         @usableFromInline

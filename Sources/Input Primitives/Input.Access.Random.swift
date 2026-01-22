@@ -123,7 +123,7 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     ///   `prefix.count` is also called, which is O(1) for `RandomAccessCollection`
     ///   but O(*n*) for other collections.
     @inlinable
-    public func starts<Prefix: Collection>(with prefix: Prefix) -> Bool
+    public func starts<Prefix: Swift.Collection>(with prefix: Prefix) -> Bool
     where Prefix.Element == Base.Element {
         guard unsafe prefix.count <= base.pointee.count else { return false }
         for (offset, element) in prefix.enumerated() {

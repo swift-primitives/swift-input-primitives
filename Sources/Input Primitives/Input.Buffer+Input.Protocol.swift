@@ -31,8 +31,13 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     public var first: Element? {
-        guard position < storage.endIndex else { return nil }
-        return storage[position]
+        _read {
+            if position < storage.endIndex {
+                yield storage[position]
+            } else {
+                yield nil
+            }
+        }
     }
 
     @inlinable

@@ -23,7 +23,13 @@ extension Input.Slice: Input.`Protocol` {
 
     @inlinable
     public var first: Element? {
-        isEmpty ? nil : base[startIndex]
+        _read {
+            if startIndex < endIndex {
+                yield base[startIndex]
+            } else {
+                yield nil
+            }
+        }
     }
 
     @inlinable

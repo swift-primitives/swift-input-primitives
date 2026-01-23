@@ -44,8 +44,68 @@ extension Input.Stream {
     ///       ↑
     /// Input.Access.Random    ← adds subscript(offset:), access.starts(with:)
     /// ```
+    ///
+    /// ## Element Type Constraint
+    ///
+    /// The `Element` associated type implicitly requires `Copyable` per
+    /// [SE-0427](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0427-noncopyable-generics.md).
+    /// Swift does not yet support `associatedtype Element: ~Copyable`.
+    ///
+    /// This limitation is **language-level**, not a design choice:
+    /// - SE-0427 deferred `~Copyable` suppression on associated types
+    /// - Standard library collections also require `Copyable` elements
+    /// - Future Swift versions may lift this restriction
+    ///
+    /// ## Borrowing Semantics
+    ///
+    /// Conformers SHOULD implement `first` using the `_read` coroutine accessor
+    /// to provide borrowing semantics, avoiding unnecessary copies:
+    ///
+    /// ```swift
+    /// var first: Element? {
+    ///     _read {
+    ///         if position < storage.endIndex {
+    ///             yield storage[position]
+    ///         } else {
+    ///             yield nil
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// This prepares for [SE-0474](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0474-yielding-accessors.md)
+    /// which will formalize `yielding borrow` as a protocol requirement:
+    ///
+    /// ```swift
+    /// // Future API when SE-0474 is available:
+    /// var first: Element? { yielding borrow }
+    /// ```
+    ///
+    /// ## Future Direction
+    ///
+    /// The "timeless" API requires two language features:
+    ///
+    /// | Feature | Purpose | Status |
+    /// |---------|---------|--------|
+    /// | `associatedtype Element: ~Copyable` | Allow noncopyable elements | Awaits future SE |
+    /// | `{ yielding borrow }` in protocols | Require borrowing access | SE-0474 (not yet stable) |
+    ///
+    /// When both are available, this protocol will evolve to:
+    ///
+    /// ```swift
+    /// public protocol `Protocol`: ~Copyable {
+    ///     associatedtype Element: ~Copyable
+    ///     var first: Element? { yielding borrow }
+    ///     // ...
+    /// }
+    /// ```
+    ///
+    /// The current `_read` implementation positions conformers for this transition.
     public protocol `Protocol`: ~Copyable {
         /// The element type of the input.
+        ///
+        /// > Note: Implicitly requires `Copyable` per SE-0427.
+        /// > This is a language limitation, not a design choice.
         associatedtype Element
 
         /// Whether the input is empty.
@@ -54,6 +114,12 @@ extension Input.Stream {
         /// The first element, if any.
         ///
         /// Returns `nil` if the input is empty. Does not consume the element.
+        ///
+        /// ## Implementation Note
+        ///
+        /// Conformers SHOULD use `_read` coroutine accessor to provide
+        /// borrowing semantics, avoiding copies. This prepares for SE-0474's
+        /// `yielding borrow` accessor when it becomes available.
         var first: Element? { get }
 
         // MARK: - Primitives

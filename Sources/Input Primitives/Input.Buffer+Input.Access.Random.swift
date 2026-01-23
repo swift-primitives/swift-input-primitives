@@ -8,6 +8,6 @@
 extension Input.Buffer: Input.Access.Random {
     @inlinable
     public subscript(offset offset: Index<Element>.Offset) -> Element {
-        storage[(position + offset)!]
+        storage[storage.index(position, offsetBy: offset.rawValue)]
     }
 }

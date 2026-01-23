@@ -6,31 +6,32 @@
 //
 
 extension Input.Buffer: Input.`Protocol` {
-    /// Checkpoint type using phantom-typed `Index<Element>` from index-primitives.
+    /// Checkpoint type is the storage's native index type.
     ///
-    /// This provides:
-    /// - Type safety: `Index<Int>` ≠ `Index<String>`
-    /// - Non-negative guarantee: from `Affine.Discrete.Position`
-    /// - Sendable + Comparable conformance
-    public typealias Checkpoint = Index<Element>
+    /// This provides efficient checkpoint/restore using the storage's
+    /// own index representation.
+    public typealias Checkpoint = Storage.Index
 
-    /// The total number of elements in the storage.
-    @usableFromInline
-    var totalCount: Index<Element>.Count { storage.count }
+    /// The element type (forwarded from storage).
+    public typealias Element = Storage.Element
 
     @inlinable
-    public var count: Int { totalCount.rawValue - position.position.rawValue }
+    public var count: Int {
+        storage.distance(from: position, to: storage.endIndex)
+    }
 
     @inlinable
-    public var isEmpty: Bool { position >= totalCount }
+    public var isEmpty: Bool { position >= storage.endIndex }
 
     /// Number of elements consumed since construction.
     @inlinable
-    public var consumedCount: Int { position.position.rawValue }
+    public var consumedCount: Int {
+        storage.distance(from: storage.startIndex, to: position)
+    }
 
     @inlinable
     public var first: Element? {
-        guard position < totalCount else { return nil }
+        guard position < storage.endIndex else { return nil }
         return storage[position]
     }
 
@@ -39,7 +40,7 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     public var checkpointRange: ClosedRange<Checkpoint> {
-        .zero...Checkpoint(totalCount)
+        storage.startIndex...storage.endIndex
     }
 
     // MARK: - Primitives
@@ -47,17 +48,17 @@ extension Input.Buffer: Input.`Protocol` {
     @inlinable
     @discardableResult
     public mutating func advance() throws(Input.Stream.Error) -> Element {
-        guard position < totalCount else {
+        guard position < storage.endIndex else {
             throw .empty
         }
         let element = storage[position]
-        position = (position + 1)!
+        position = storage.index(after: position)
         return element
     }
 
     @inlinable
     public mutating func advance(by count: Int) {
-        position = (position + Index<Element>.Offset(count))!
+        position = storage.index(position, offsetBy: count)
     }
 
     @inlinable

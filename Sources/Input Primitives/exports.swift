@@ -4,4 +4,3 @@
 @_exported import Property_Primitives
 @_exported import Identity_Primitives
 @_exported import Index_Primitives
-@_exported import Array_Primitives

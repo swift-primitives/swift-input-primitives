@@ -33,7 +33,7 @@ extension InputBufferTests.Test.Unit {
 
     @Test("init from sequence")
     func initFromSequence() {
-        let buffer = Input.Buffer(1...5)
+        let buffer = Input.Buffer(sequence: 1...5)
         #expect(buffer.count == 5)
         #expect(buffer.first == 1)
     }
@@ -47,7 +47,7 @@ extension InputBufferTests.Test.Unit {
 
     @Test("isEmpty returns true for empty buffer")
     func isEmptyForEmptyBuffer() {
-        let buffer = Input.Buffer<Int>([])
+        let buffer: Input.Buffer<ContiguousArray<Int>> = Input.Buffer([])
         #expect(buffer.isEmpty == true)
         #expect(buffer.count == 0)
         #expect(buffer.first == nil)
@@ -131,7 +131,7 @@ extension InputBufferTests.Test.Unit {
 
     @Test("remove.first() throws when empty")
     func removeFirstThrowsWhenEmpty() {
-        var buffer = Input.Buffer<Int>([])
+        var buffer: Input.Buffer<ContiguousArray<Int>> = Input.Buffer([])
         #expect(throws: Input.Remove.Error.empty) {
             try buffer.remove.first()
         }
@@ -139,7 +139,7 @@ extension InputBufferTests.Test.Unit {
 
     @Test("try? remove.first() returns nil when empty")
     func tryRemoveFirstReturnsNilWhenEmpty() {
-        var buffer = Input.Buffer<Int>([])
+        var buffer: Input.Buffer<ContiguousArray<Int>> = Input.Buffer([])
         let result = try? buffer.remove.first()
         #expect(result == nil)
         #expect(buffer.isEmpty == true)
@@ -240,9 +240,8 @@ extension InputBufferTests.Test.EdgeCase {
     @Test("restore throws for invalid checkpoint")
     func restoreThrowsForInvalidCheckpoint() {
         var buffer = Input.Buffer([1, 2, 3])
-        // Index<Element> is non-negative by construction, so we can't test -1
-        // Test out-of-bounds checkpoint (position 100 for 3-element buffer)
-        let invalidCheckpoint: Input.Buffer<Int>.Checkpoint = 100
+        // For ContiguousArray, the index is Int. Position 100 is out of bounds.
+        let invalidCheckpoint: Int = 100
         #expect(throws: Input.Restore.Error.invalidCheckpoint) {
             try buffer.restore.to(invalidCheckpoint)
         }

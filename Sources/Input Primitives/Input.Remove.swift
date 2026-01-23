@@ -46,20 +46,23 @@ extension Property.View where Tag == Input.Remove, Base: Input.Streaming & ~Copy
     @inlinable
     @discardableResult
     public func first() throws(Input.Remove.Error) -> Base.Element {
-        guard unsafe !base.pointee.isEmpty else {
+        do {
+            return try unsafe base.pointee.advance()
+        } catch {
             throw .empty
         }
-        return unsafe base.pointee.advance()
     }
 
     /// Advances cursor directly without validation.
     ///
     /// - Precondition: `!isEmpty`
     /// - Returns: The consumed element.
+    ///
+    /// - Warning: Undefined behavior if input is empty. Use `advance()` for safe access.
     @inlinable
     @discardableResult
     public func first(__unchecked: Void) -> Base.Element {
-        unsafe base.pointee.advance()
+        try! unsafe base.pointee.advance()
     }
 }
 

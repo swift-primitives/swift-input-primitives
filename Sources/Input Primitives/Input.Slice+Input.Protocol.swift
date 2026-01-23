@@ -42,7 +42,10 @@ extension Input.Slice: Input.`Protocol` {
 
     @inlinable
     @discardableResult
-    public mutating func advance() -> Element {
+    public mutating func advance() throws(Input.Stream.Error) -> Element {
+        guard startIndex < endIndex else {
+            throw .empty
+        }
         let element = base[startIndex]
         startIndex = base.index(after: startIndex)
         return element

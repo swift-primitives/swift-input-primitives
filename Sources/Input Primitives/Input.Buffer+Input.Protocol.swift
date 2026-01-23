@@ -46,7 +46,10 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     @discardableResult
-    public mutating func advance() -> Element {
+    public mutating func advance() throws(Input.Stream.Error) -> Element {
+        guard position < totalCount else {
+            throw .empty
+        }
         let element = storage[position]
         position = (position + 1)!
         return element

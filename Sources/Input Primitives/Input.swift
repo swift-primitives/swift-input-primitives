@@ -14,11 +14,11 @@
 /// ## Protocol Hierarchy
 ///
 /// ```
-/// Input.Streaming  ← minimal forward-only (isEmpty, first, remove)
+/// Input.Stream.Protocol  ← minimal forward-only (isEmpty, first, advance)
 ///        ↑
-/// Input.Protocol   ← adds checkpoint/restore, count, remove.first(_:)
+/// Input.Protocol         ← adds checkpoint/restore, count, advance(by:)
 ///        ↑
-/// Input.Random     ← adds subscript(offset:), starts(with:)
+/// Input.Access.Random    ← adds subscript(offset:), starts(with:)
 /// ```
 ///
 /// ## Concrete Types

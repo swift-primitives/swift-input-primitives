@@ -31,7 +31,18 @@ public enum __InputSliceError: Swift.Error, Sendable, Equatable {
     case invalidBounds(startIndex: Int, endIndex: Int)
 }
 
-// MARK: - Typealias (Nest.Name API)
+//// MARK: - Typealias (Nest.Name API)
+//
+//extension Input.Slice {
+//    /// Errors for slice construction.
+//    ///
+//    /// Thrown when constructing a slice with invalid bounds.
+//    ///
+//    /// ## Cases
+//    ///
+//    /// - ``invalidBounds(startIndex:endIndex:)``: The start index exceeds the end index.
+//    public typealias Error = __InputSliceError
+//}
 
 extension Input.Slice {
     /// Errors for slice construction.
@@ -41,5 +52,14 @@ extension Input.Slice {
     /// ## Cases
     ///
     /// - ``invalidBounds(startIndex:endIndex:)``: The start index exceeds the end index.
-    public typealias Error = __InputSliceError
+    public enum Error: Swift.Error, Sendable, Equatable {
+        /// Bounds are invalid.
+        ///
+        /// Thrown when `startIndex > endIndex`.
+        ///
+        /// - Parameters:
+        ///   - startIndex: The provided start index (as offset from base start).
+        ///   - endIndex: The provided end index (as offset from base start).
+        case invalidBounds(startIndex: Base.Index, endIndex: Base.Index)
+    }
 }

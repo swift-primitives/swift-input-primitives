@@ -14,7 +14,7 @@ extension Input.Remove {
     ///
     /// - ``empty``: The input is empty.
     /// - ``insufficientElements(requested:available:)``: Requested more elements than available.
-    public enum Error: Swift.Error, Sendable, Equatable {
+    public enum Error<Element: ~Copyable>: Swift.Error, Sendable, Equatable {
         /// The input is empty.
         ///
         /// Thrown by `first()` when no elements remain.
@@ -27,6 +27,6 @@ extension Input.Remove {
         /// - Parameters:
         ///   - requested: The number of elements requested.
         ///   - available: The number of elements actually available.
-        case insufficientElements(requested: Int, available: Int)
+        case insufficientElements(requested: Index<Element>.Count, available: Index<Element>.Count)
     }
 }

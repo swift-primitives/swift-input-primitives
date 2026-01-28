@@ -105,10 +105,12 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     /// - Throws: ``Input/Access/Error/outOfBounds(offset:count:)`` if the offset
     ///   is negative or exceeds the remaining element count.
     @inlinable
-    public func element(at offset: Index<Base.Element>.Offset) throws(Input.Access.Error) -> Base.Element {
+    public func element(
+        at offset: Index<Base.Element>.Offset
+    ) throws(Input.Access.Error<Base.Element>) -> Base.Element {
         let count = unsafe base.pointee.count
-        guard offset.rawValue >= 0 && offset.rawValue < count else {
-            throw .outOfBounds(offset: offset.rawValue, count: count)
+        guard offset >= .zero && offset < count else {
+            throw .outOfBounds(offset: offset, count: count)
         }
         return unsafe base.pointee[offset: offset]
     }
@@ -125,7 +127,8 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     @inlinable
     public func starts<Prefix: Swift.Collection>(with prefix: Prefix) -> Bool
     where Prefix.Element == Base.Element {
-        guard unsafe prefix.count <= base.pointee.count else { return false }
+        let prefixCount = try! Index<Base.Element>.Count(prefix.count)
+        guard unsafe prefixCount <= base.pointee.count else { return false }
         for (offset, element) in prefix.enumerated() {
             if unsafe base.pointee[offset: Index<Base.Element>.Offset(offset)] != element { return false }
         }

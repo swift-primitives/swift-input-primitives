@@ -6,6 +6,21 @@
 import Testing
 
 @testable import Input_Primitives
+public import Collection_Primitives
+
+extension ArraySlice: Collection.`Protocol` {
+    public var startIndex: Index {
+        .zero
+    }
+    
+    public var endIndex: Index {
+        .max
+    }
+    
+    public func index(after i: Index) -> Index {
+        fatalError()
+    }
+}
 
 // MARK: - Test Suite Structure
 

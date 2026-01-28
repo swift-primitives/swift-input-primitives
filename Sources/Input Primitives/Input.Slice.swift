@@ -5,6 +5,8 @@
 //  Zero-copy cursor over a collection.
 //
 
+public import Collection_Primitives
+
 extension Input {
     /// Zero-copy cursor over a collection.
     ///
@@ -33,7 +35,7 @@ extension Input {
     /// input.restore(to: checkpoint)
     /// assert(input.first == 0x48)
     /// ```
-    public struct Slice<Base: Swift.Collection>: Sendable
+    public struct Slice<Base: Collection.`Protocol`>: Sendable
     where Base: Sendable, Base.Index: Sendable {
         /// The underlying collection.
         @usableFromInline
@@ -73,8 +75,8 @@ extension Input {
         ) throws(Input.Slice<Base>.Error) {
             guard startIndex <= endIndex else {
                 throw .invalidBounds(
-                    startIndex: base.distance(from: base.startIndex, to: startIndex),
-                    endIndex: base.distance(from: base.startIndex, to: endIndex)
+                    startIndex: startIndex,
+                    endIndex: endIndex
                 )
             }
             self.base = base

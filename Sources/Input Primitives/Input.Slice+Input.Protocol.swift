@@ -5,6 +5,8 @@
 //  Input.Protocol conformance for Input.Slice.
 //
 
+public import Collection_Primitives
+
 extension Input.Slice: Input.`Protocol` {
     public typealias Element = Base.Element
 
@@ -17,8 +19,8 @@ extension Input.Slice: Input.`Protocol` {
     }
 
     @inlinable
-    public var count: Int {
-        base.distance(from: startIndex, to: endIndex)
+    public var count: Index<Element>.Count {
+        try! Index<Element>.Count(base.distance(from: startIndex, to: endIndex))
     }
 
     @inlinable
@@ -58,8 +60,8 @@ extension Input.Slice: Input.`Protocol` {
     }
 
     @inlinable
-    public mutating func advance(by count: Int) {
-        startIndex = base.index(startIndex, offsetBy: count)
+    public mutating func advance(by offset: Index<Element>.Offset) {
+        startIndex = base.index(startIndex, offsetBy: offset)
     }
 
     @inlinable

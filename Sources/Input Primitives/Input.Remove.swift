@@ -45,7 +45,7 @@ extension Property.View where Tag == Input.Remove, Base: Input.Streaming & ~Copy
     /// - Throws: ``Input/Remove/Error/empty`` if the input is empty.
     @inlinable
     @discardableResult
-    public func first() throws(Input.Remove.Error) -> Base.Element {
+    public func first() throws(Input.Remove.Error<Base.Element>) -> Base.Element {
         do {
             return try unsafe base.pointee.advance()
         } catch {
@@ -75,19 +75,19 @@ extension Property.View where Tag == Input.Remove, Base: Input.`Protocol` & ~Cop
     /// - Throws: ``Input/Remove/Error/insufficientElements(requested:available:)``
     ///   if `count` exceeds the remaining elements.
     @inlinable
-    public func first(_ count: Int) throws(Input.Remove.Error) {
+    public func first(_ count: Index<Base.Element>.Count) throws(Input.Remove.Error<Base.Element>) {
         let available = unsafe base.pointee.count
-        guard count >= 0 && count <= available else {
+        guard count <= available else {
             throw .insufficientElements(requested: count, available: available)
         }
-        unsafe base.pointee.advance(by: count)
+        unsafe base.pointee.advance(by: Index<Base.Element>.Offset(count))
     }
 
     /// Advances cursor by count directly without validation.
     ///
-    /// - Precondition: `count >= 0 && count <= self.count`
+    /// - Precondition: `count <= self.count`
     @inlinable
-    public func first(__unchecked: Void, _ count: Int) {
-        unsafe base.pointee.advance(by: count)
+    public func first(__unchecked: Void, _ count: Index<Base.Element>.Count) {
+        unsafe base.pointee.advance(by: Index<Base.Element>.Offset(count))
     }
 }

@@ -74,7 +74,7 @@ extension Input {
         associatedtype Checkpoint: Sendable & Comparable
 
         /// The number of elements remaining.
-        var count: Int { get }
+        var count: Index<Element>.Count { get }
 
         /// Creates a checkpoint at the current position.
         ///
@@ -97,12 +97,12 @@ extension Input {
         /// > Note: Conformance primitive. Use `restore.to(_:)` for validated API.
         mutating func setPosition(to checkpoint: Checkpoint)
 
-        /// Advances the cursor by `count` elements.
+        /// Advances the cursor by the given offset.
         ///
-        /// - Precondition: `count >= 0 && count <= self.count`
+        /// - Precondition: `offset >= .zero && offset < count`
         ///
         /// > Note: Conformance primitive. Use `remove.first(_:)` for validated API.
-        mutating func advance(by count: Int)
+        mutating func advance(by offset: Index<Element>.Offset)
     }
 }
 

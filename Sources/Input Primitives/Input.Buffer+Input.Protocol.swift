@@ -16,8 +16,8 @@ extension Input.Buffer: Input.`Protocol` {
     public typealias Element = Storage.Element
 
     @inlinable
-    public var count: Int {
-        storage.distance(from: position, to: storage.endIndex)
+    public var count: Index<Element>.Count {
+        try! Index<Element>.Count(storage.distance(from: position, to: storage.endIndex))
     }
 
     @inlinable
@@ -25,8 +25,8 @@ extension Input.Buffer: Input.`Protocol` {
 
     /// Number of elements consumed since construction.
     @inlinable
-    public var consumedCount: Int {
-        storage.distance(from: storage.startIndex, to: position)
+    public var consumedCount: Index<Element>.Count {
+        try! Index<Element>.Count(storage.distance(from: storage.startIndex, to: position))
     }
 
     @inlinable
@@ -62,8 +62,8 @@ extension Input.Buffer: Input.`Protocol` {
     }
 
     @inlinable
-    public mutating func advance(by count: Int) {
-        position = storage.index(position, offsetBy: count)
+    public mutating func advance(by offset: Index<Element>.Offset) {
+        position = storage.index(position, offsetBy: offset)
     }
 
     @inlinable

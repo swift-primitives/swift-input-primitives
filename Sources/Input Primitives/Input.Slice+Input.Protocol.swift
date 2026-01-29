@@ -10,24 +10,30 @@ public import Collection_Primitives
 extension Input.Slice: Input.`Protocol` {
     public typealias Element = Base.Element
 
-    /// Checkpoint type is the collection's native index type.
-    public typealias Checkpoint = Base.Index
+    /// Checkpoint type is the typed index (position within slice).
+    public typealias Checkpoint = Index<Element>
+
+    /// Total count of elements in the slice.
+    @inlinable
+    var totalCount: Index<Element>.Count {
+        try! Index<Element>.Count(base.distance(from: sliceStart, to: sliceEnd))
+    }
 
     @inlinable
     public var isEmpty: Bool {
-        startIndex >= endIndex
+        position >= totalCount  // Typed comparison
     }
 
     @inlinable
     public var count: Index<Element>.Count {
-        try! Index<Element>.Count(base.distance(from: startIndex, to: endIndex))
+        totalCount.subtract.saturating(Index<Element>.Count(position))
     }
 
     @inlinable
     public var first: Element? {
         _read {
-            if startIndex < endIndex {
-                yield base[startIndex]
+            if !isEmpty {
+                yield base[rawIndex]  // Use rawIndex for subscripting
             } else {
                 yield nil
             }
@@ -36,14 +42,12 @@ extension Input.Slice: Input.`Protocol` {
 
     @inlinable
     public var checkpoint: Checkpoint {
-        startIndex
+        position
     }
 
     @inlinable
     public var checkpointRange: ClosedRange<Checkpoint> {
-        // Valid range: from base start to our endIndex
-        // (can restore to any position we've seen, up to end)
-        base.startIndex...endIndex
+        .zero...Index<Element>(totalCount)  // Typed range
     }
 
     // MARK: - Primitives
@@ -51,21 +55,21 @@ extension Input.Slice: Input.`Protocol` {
     @inlinable
     @discardableResult
     public mutating func advance() throws(Input.Stream.Error) -> Element {
-        guard startIndex < endIndex else {
+        guard !isEmpty else {
             throw .empty
         }
-        let element = base[startIndex]
-        startIndex = base.index(after: startIndex)
+        let element = base[rawIndex]
+        position = position + .one  // Typed increment
         return element
     }
 
     @inlinable
-    public mutating func advance(by offset: Index<Element>.Offset) {
-        startIndex = base.index(startIndex, offsetBy: offset)
+    public mutating func advance(by count: Index<Element>.Count) {
+        position = position + count  // Pure typed arithmetic!
     }
 
     @inlinable
     public mutating func setPosition(to checkpoint: Checkpoint) {
-        startIndex = checkpoint
+        position = checkpoint
     }
 }

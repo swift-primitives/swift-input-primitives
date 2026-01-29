@@ -41,13 +41,27 @@ extension Input {
         @usableFromInline
         let base: Base
 
-        /// The current start position.
+        /// The raw start index of the slice in base (fixed at construction).
         @usableFromInline
-        var startIndex: Base.Index
+        let sliceStart: Base.Index
 
-        /// The end position (fixed at construction).
+        /// The raw end index of the slice in base (fixed at construction).
         @usableFromInline
-        let endIndex: Base.Index
+        let sliceEnd: Base.Index
+
+        /// The current position as a typed index (relative to slice start).
+        ///
+        /// Primary representation for typed arithmetic (`position + count`).
+        @usableFromInline
+        var position: Index<Base.Element>
+
+        /// The raw current index for subscripting.
+        ///
+        /// Derives `Base.Index` from typed position. O(1) for RandomAccessCollection.
+        @inlinable
+        var rawIndex: Base.Index {
+            base.index(sliceStart, offsetBy: Int(bitPattern: position))
+        }
 
         /// Creates a slice cursor over the entire collection.
         ///
@@ -55,8 +69,9 @@ extension Input {
         @inlinable
         public init(_ base: Base) {
             self.base = base
-            self.startIndex = base.startIndex
-            self.endIndex = base.endIndex
+            self.sliceStart = base.startIndex
+            self.sliceEnd = base.endIndex
+            self.position = .zero
         }
 
         /// Creates a slice cursor with explicit bounds.
@@ -80,8 +95,9 @@ extension Input {
                 )
             }
             self.base = base
-            self.startIndex = startIndex
-            self.endIndex = endIndex
+            self.sliceStart = startIndex
+            self.sliceEnd = endIndex
+            self.position = .zero
         }
 
         /// Creates a slice cursor with explicit bounds without validation.
@@ -99,8 +115,9 @@ extension Input {
             endIndex: Base.Index
         ) {
             self.base = base
-            self.startIndex = startIndex
-            self.endIndex = endIndex
+            self.sliceStart = startIndex
+            self.sliceEnd = endIndex
+            self.position = .zero
         }
     }
 }

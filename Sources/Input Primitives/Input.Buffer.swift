@@ -54,9 +54,12 @@ extension Input {
         @usableFromInline
         var storage: Storage
 
-        /// The current position in the storage.
+        /// The current position as a typed index.
+        ///
+        /// Primary representation for typed arithmetic (`position + count`).
+        /// Raw `Storage.Index` is derived via `rawIndex` when subscripting.
         @usableFromInline
-        var position: Storage.Index
+        var position: Index<Storage.Element>
 
         /// Creates a buffer cursor over the given storage.
         ///
@@ -64,7 +67,15 @@ extension Input {
         @inlinable
         public init(_ storage: Storage) {
             self.storage = storage
-            self.position = storage.startIndex
+            self.position = .zero
+        }
+
+        /// The raw storage index for subscripting.
+        ///
+        /// O(1) for `RandomAccessCollection`. Conversion encapsulated here.
+        @inlinable
+        var rawIndex: Storage.Index {
+            storage.index(storage.startIndex, offsetBy: Int(bitPattern: position))
         }
     }
 }
@@ -78,7 +89,7 @@ extension Input.Buffer {
     @inlinable
     public init<Element: Sendable>(_ elements: [Element]) where Storage == ContiguousArray<Element> {
         self.storage = ContiguousArray(elements)
-        self.position = storage.startIndex
+        self.position = .zero
     }
 
     /// Creates a buffer cursor by copying elements from a sequence into a ContiguousArray.
@@ -87,7 +98,7 @@ extension Input.Buffer {
     @inlinable
     public init<S: Swift.Sequence>(sequence: S) where Storage == ContiguousArray<S.Element>, S.Element: Sendable {
         self.storage = ContiguousArray(sequence)
-        self.position = storage.startIndex
+        self.position = .zero
     }
 
     /// Creates a buffer cursor with repeating element in a ContiguousArray.
@@ -98,7 +109,7 @@ extension Input.Buffer {
     @inlinable
     public init<Element: Sendable>(repeating element: Element, count: Int) where Storage == ContiguousArray<Element> {
         self.storage = ContiguousArray(repeating: element, count: Swift.max(0, count))
-        self.position = storage.startIndex
+        self.position = .zero
     }
 }
 

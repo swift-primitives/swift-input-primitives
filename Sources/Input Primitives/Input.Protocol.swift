@@ -97,12 +97,12 @@ extension Input {
         /// > Note: Conformance primitive. Use `restore.to(_:)` for validated API.
         mutating func setPosition(to checkpoint: Checkpoint)
 
-        /// Advances the cursor by the given offset.
+        /// Advances the cursor by the given count.
         ///
-        /// - Precondition: `offset >= .zero && offset < count`
+        /// - Precondition: `count <= self.count`
         ///
         /// > Note: Conformance primitive. Use `remove.first(_:)` for validated API.
-        mutating func advance(by offset: Index<Element>.Offset)
+        mutating func advance(by count: Index<Element>.Count)
     }
 }
 

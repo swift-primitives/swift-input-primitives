@@ -6,34 +6,42 @@
 //
 
 extension Input.Buffer: Input.`Protocol` {
-    /// Checkpoint type is the storage's native index type.
+    /// Checkpoint type is the typed index.
     ///
-    /// This provides efficient checkpoint/restore using the storage's
-    /// own index representation.
-    public typealias Checkpoint = Storage.Index
+    /// Using `Index<Element>` maintains type safety throughout the
+    /// checkpoint/restore mechanism.
+    public typealias Checkpoint = Index<Element>
 
     /// The element type (forwarded from storage).
     public typealias Element = Storage.Element
 
+    /// Total count of elements in storage.
     @inlinable
-    public var count: Index<Element>.Count {
-        try! Index<Element>.Count(storage.distance(from: position, to: storage.endIndex))
+    var totalCount: Index<Element>.Count {
+        try! Index<Element>.Count(storage.count)
     }
 
     @inlinable
-    public var isEmpty: Bool { position >= storage.endIndex }
+    public var count: Index<Element>.Count {
+        totalCount.subtract.saturating(Index<Element>.Count(position))
+    }
+
+    @inlinable
+    public var isEmpty: Bool {
+        position >= totalCount  // Typed comparison
+    }
 
     /// Number of elements consumed since construction.
     @inlinable
     public var consumedCount: Index<Element>.Count {
-        try! Index<Element>.Count(storage.distance(from: storage.startIndex, to: position))
+        Index<Element>.Count(position)  // Position IS the consumed count
     }
 
     @inlinable
     public var first: Element? {
         _read {
-            if position < storage.endIndex {
-                yield storage[position]
+            if !isEmpty {
+                yield storage[rawIndex]  // Use rawIndex for subscripting
             } else {
                 yield nil
             }
@@ -45,7 +53,7 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     public var checkpointRange: ClosedRange<Checkpoint> {
-        storage.startIndex...storage.endIndex
+        .zero...Index<Element>(totalCount)  // Typed range
     }
 
     // MARK: - Primitives
@@ -53,17 +61,17 @@ extension Input.Buffer: Input.`Protocol` {
     @inlinable
     @discardableResult
     public mutating func advance() throws(Input.Stream.Error) -> Element {
-        guard position < storage.endIndex else {
+        guard !isEmpty else {
             throw .empty
         }
-        let element = storage[position]
-        position = storage.index(after: position)
+        let element = storage[rawIndex]
+        position = position + .one  // Typed increment
         return element
     }
 
     @inlinable
-    public mutating func advance(by offset: Index<Element>.Offset) {
-        position = storage.index(position, offsetBy: offset)
+    public mutating func advance(by count: Index<Element>.Count) {
+        position = position + count  // Pure typed arithmetic!
     }
 
     @inlinable

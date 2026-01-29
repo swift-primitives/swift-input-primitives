@@ -13,6 +13,6 @@ extension Input.Slice: Input.Access.Random where Base: Input.Access.Random {
     public subscript(
         offset offset: Index<Element>.Offset
     ) -> Element {
-        base[base.index(startIndex, offsetBy: offset)]
+        base[base.index(rawIndex, offsetBy: offset)]
     }
 }

@@ -80,7 +80,7 @@ extension Property.View where Tag == Input.Remove, Base: Input.`Protocol` & ~Cop
         guard count <= available else {
             throw .insufficientElements(requested: count, available: available)
         }
-        unsafe base.pointee.advance(by: Index<Base.Element>.Offset(count))
+        unsafe base.pointee.advance(by: count)
     }
 
     /// Advances cursor by count directly without validation.
@@ -88,6 +88,6 @@ extension Property.View where Tag == Input.Remove, Base: Input.`Protocol` & ~Cop
     /// - Precondition: `count <= self.count`
     @inlinable
     public func first(__unchecked: Void, _ count: Index<Base.Element>.Count) {
-        unsafe base.pointee.advance(by: Index<Base.Element>.Offset(count))
+        unsafe base.pointee.advance(by: count)
     }
 }

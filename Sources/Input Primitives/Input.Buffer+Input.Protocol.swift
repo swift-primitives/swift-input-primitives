@@ -53,7 +53,7 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     public var checkpointRange: ClosedRange<Checkpoint> {
-        .zero...Index<Element>(totalCount)  // Typed range
+        .zero...totalCount.map(Ordinal.init)  // Count -> Index via functor
     }
 
     // MARK: - Primitives

@@ -16,7 +16,7 @@ extension Input.Slice: Input.`Protocol` {
     /// Total count of elements in the slice.
     @inlinable
     var totalCount: Index<Element>.Count {
-        try! Index<Element>.Count(base.distance(from: sliceStart, to: sliceEnd))
+        try! sliceStart.distance.forward(to: sliceEnd)
     }
 
     @inlinable
@@ -47,7 +47,7 @@ extension Input.Slice: Input.`Protocol` {
 
     @inlinable
     public var checkpointRange: ClosedRange<Checkpoint> {
-        .zero...Index<Element>(totalCount)  // Typed range
+        .zero...totalCount.map(Ordinal.init)  // Count -> Index via functor
     }
 
     // MARK: - Primitives

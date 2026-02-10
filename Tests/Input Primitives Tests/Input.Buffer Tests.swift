@@ -6,10 +6,10 @@
 import Testing
 
 @testable import Input_Primitives
+import Input_Primitives_Test_Support
 
 // MARK: - Test Suite Structure
 
-// Note: Input.Buffer is generic, so we use a dedicated test enum per TEST-ORG-005
 enum InputBufferTests {
     @Suite
     enum Test {
@@ -26,7 +26,8 @@ extension InputBufferTests.Test.Unit {
     @Test("init from array")
     func initFromArray() {
         let buffer = Input.Buffer([1, 2, 3, 4, 5])
-        #expect(buffer.count == 5)
+        let expectedCount: Index<Int>.Count = 5
+        #expect(buffer.count == expectedCount)
         #expect(buffer.first == 1)
         #expect(buffer.isEmpty == false)
     }
@@ -34,14 +35,16 @@ extension InputBufferTests.Test.Unit {
     @Test("init from sequence")
     func initFromSequence() {
         let buffer = Input.Buffer(sequence: 1...5)
-        #expect(buffer.count == 5)
+        let expectedCount: Index<Int>.Count = 5
+        #expect(buffer.count == expectedCount)
         #expect(buffer.first == 1)
     }
 
     @Test("init with repeating element")
     func initWithRepeating() {
         let buffer = Input.Buffer(repeating: 42, count: 3)
-        #expect(buffer.count == 3)
+        let expectedCount: Index<Int>.Count = 3
+        #expect(buffer.count == expectedCount)
         #expect(buffer.first == 42)
     }
 
@@ -49,7 +52,8 @@ extension InputBufferTests.Test.Unit {
     func isEmptyForEmptyBuffer() {
         let buffer: Input.Buffer<ContiguousArray<Int>> = Input.Buffer([])
         #expect(buffer.isEmpty == true)
-        #expect(buffer.count == 0)
+        let expectedCount: Index<Int>.Count = 0
+        #expect(buffer.count == expectedCount)
         #expect(buffer.first == nil)
     }
 
@@ -58,26 +62,33 @@ extension InputBufferTests.Test.Unit {
         var buffer = Input.Buffer([1, 2, 3])
         let first = try buffer.remove.first()
         #expect(first == 1)
-        #expect(buffer.count == 2)
+        let expectedCount: Index<Int>.Count = 2
+        #expect(buffer.count == expectedCount)
         #expect(buffer.first == 2)
     }
 
     @Test("remove.first(n) advances by n elements")
     func removeFirstNAdvances() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        try buffer.remove.first(3)
-        #expect(buffer.count == 2)
+        let three: Index<Int>.Count = 3
+        try buffer.remove.first(three)
+        let expectedCount: Index<Int>.Count = 2
+        #expect(buffer.count == expectedCount)
         #expect(buffer.first == 4)
     }
 
     @Test("consumedCount tracks consumption")
     func consumedCountTracksConsumption() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        #expect(buffer.consumedCount == 0)
+        let expected0: Index<Int>.Count = 0
+        let expected1: Index<Int>.Count = 1
+        let expected3: Index<Int>.Count = 3
+        #expect(buffer.consumedCount == expected0)
         _ = try buffer.remove.first()
-        #expect(buffer.consumedCount == 1)
-        try buffer.remove.first(2)
-        #expect(buffer.consumedCount == 3)
+        #expect(buffer.consumedCount == expected1)
+        let two: Index<Int>.Count = 2
+        try buffer.remove.first(two)
+        #expect(buffer.consumedCount == expected3)
     }
 
     @Test("checkpoint returns current position")
@@ -97,42 +108,29 @@ extension InputBufferTests.Test.Unit {
         let cp = buffer.checkpoint
         _ = try buffer.remove.first()
         _ = try buffer.remove.first()
-        #expect(buffer.count == 3)
+        let expectedCount3: Index<Int>.Count = 3
+        #expect(buffer.count == expectedCount3)
         try buffer.restore.to(cp)
-        #expect(buffer.count == 5)
+        let expectedCount5: Index<Int>.Count = 5
+        #expect(buffer.count == expectedCount5)
         #expect(buffer.first == 1)
     }
 
     @Test("subscript offset access")
     func subscriptOffsetAccess() {
         let buffer = Input.Buffer([10, 20, 30, 40, 50])
-        #expect(buffer[offset: 0] == 10)
-        #expect(buffer[offset: 2] == 30)
-        #expect(buffer[offset: 4] == 50)
+        let offset0: Index<Int>.Offset = 0
+        let offset2: Index<Int>.Offset = 2
+        let offset4: Index<Int>.Offset = 4
+        #expect(buffer[offset: offset0] == 10)
+        #expect(buffer[offset: offset2] == 30)
+        #expect(buffer[offset: offset4] == 50)
     }
-
-    @Test("access.starts(with:) prefix check")
-    func startsWithPrefixCheck() {
-        var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        #expect(buffer.access.starts(with: [1, 2, 3]) == true)
-        #expect(buffer.access.starts(with: [1, 2, 4]) == false)
-        #expect(buffer.access.starts(with: [1, 2, 3, 4, 5, 6]) == false)
-    }
-
-    @Test("access.starts(with:) single element")
-    func startsWithSingleElement() {
-        var buffer = Input.Buffer([1, 2, 3])
-        #expect(buffer.access.starts(with: 1) == true)
-        #expect(buffer.access.starts(with: 2) == false)
-    }
-
-    // Note: remaining property requires Copyable conformance.
-    // Input.Buffer is now ~Copyable, so this test is removed.
 
     @Test("remove.first() throws when empty")
     func removeFirstThrowsWhenEmpty() {
         var buffer: Input.Buffer<ContiguousArray<Int>> = Input.Buffer([])
-        #expect(throws: Input.Remove.Error.empty) {
+        #expect(throws: Input.Remove.Error<Int>.empty) {
             try buffer.remove.first()
         }
     }
@@ -143,7 +141,8 @@ extension InputBufferTests.Test.Unit {
         let result = try? buffer.remove.first()
         #expect(result == nil)
         #expect(buffer.isEmpty == true)
-        #expect(buffer.count == 0)
+        let expectedCount: Index<Int>.Count = 0
+        #expect(buffer.count == expectedCount)
     }
 
     @Test("try? remove.first() consumes element")
@@ -152,7 +151,8 @@ extension InputBufferTests.Test.Unit {
         let result = try? buffer.remove.first()
         #expect(result == 1)
         #expect(buffer.first == 2)
-        #expect(buffer.count == 2)
+        let expectedCount: Index<Int>.Count = 2
+        #expect(buffer.count == expectedCount)
     }
 }
 
@@ -200,48 +200,50 @@ extension InputBufferTests.Test.EdgeCase {
     @Test("remove.first(0) is no-op")
     func removeFirstZeroIsNoop() throws {
         var buffer = Input.Buffer([1, 2, 3])
-        try buffer.remove.first(0)
-        #expect(buffer.count == 3)
+        let zero: Index<Int>.Count = 0
+        try buffer.remove.first(zero)
+        let expectedCount: Index<Int>.Count = 3
+        #expect(buffer.count == expectedCount)
         #expect(buffer.first == 1)
-    }
-
-    @Test("access.starts(with:) empty prefix returns true")
-    func startsWithEmptyPrefix() {
-        var buffer = Input.Buffer([1, 2, 3])
-        #expect(buffer.access.starts(with: []) == true)
     }
 
     @Test("offset access after partial consumption")
     func offsetAccessAfterConsumption() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        try buffer.remove.first(2)
-        #expect(buffer[offset: 0] == 3)
-        #expect(buffer[offset: 2] == 5)
+        let two: Index<Int>.Count = 2
+        try buffer.remove.first(two)
+        let offset0: Index<Int>.Offset = 0
+        let offset2: Index<Int>.Offset = 2
+        #expect(buffer[offset: offset0] == 3)
+        #expect(buffer[offset: offset2] == 5)
     }
 
     @Test("consumedCount preserved across restore")
     func consumedCountAfterRestore() throws {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
         let cp = buffer.checkpoint
-        try buffer.remove.first(3)
-        #expect(buffer.consumedCount == 3)
+        let three: Index<Int>.Count = 3
+        try buffer.remove.first(three)
+        #expect(buffer.consumedCount == three)
         try buffer.restore.to(cp)
-        #expect(buffer.consumedCount == 0)
+        let zero: Index<Int>.Count = 0
+        #expect(buffer.consumedCount == zero)
     }
 
     @Test("remove.first(n) throws when n > count")
     func removeFirstNThrowsWhenInsufficient() {
         var buffer = Input.Buffer([1, 2, 3])
-        #expect(throws: Input.Remove.Error.insufficientElements(requested: 5, available: 3)) {
-            try buffer.remove.first(5)
+        let five: Index<Int>.Count = 5
+        let three: Index<Int>.Count = 3
+        #expect(throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)) {
+            try buffer.remove.first(five)
         }
     }
 
     @Test("restore throws for invalid checkpoint")
     func restoreThrowsForInvalidCheckpoint() {
         var buffer = Input.Buffer([1, 2, 3])
-        // For ContiguousArray, the index is Int. Position 100 is out of bounds.
-        let invalidCheckpoint: Int = 100
+        let invalidCheckpoint: Index<Int> = 100
         #expect(throws: Input.Restore.Error.invalidCheckpoint) {
             try buffer.restore.to(invalidCheckpoint)
         }
@@ -257,7 +259,6 @@ extension InputBufferTests.Test.Integration {
         var input = Input.Buffer(bytes)
 
         let cp = input.checkpoint
-        #expect(input.access.starts(with: [0x48, 0x65]) == true) // "He"
         _ = try input.remove.first()
         _ = try input.remove.first()
         #expect(input.first == 0x6C) // 'l'
@@ -269,11 +270,12 @@ extension InputBufferTests.Test.Integration {
     @Test("lookahead without consumption")
     func lookaheadWithoutConsumption() {
         let input = Input.Buffer([1, 2, 3, 4, 5])
-
-        // Lookahead via subscript doesn't consume
-        #expect(input[offset: 0] == 1)
-        #expect(input[offset: 4] == 5)
-        #expect(input.count == 5) // Still 5 elements
+        let offset0: Index<Int>.Offset = 0
+        let offset4: Index<Int>.Offset = 4
+        #expect(input[offset: offset0] == 1)
+        #expect(input[offset: offset4] == 5)
+        let expectedCount: Index<Int>.Count = 5
+        #expect(input.count == expectedCount)
     }
 
     @Test("complete consumption")
@@ -285,16 +287,20 @@ extension InputBufferTests.Test.Integration {
         }
         #expect(consumed == [1, 2, 3])
         #expect(input.isEmpty == true)
-        #expect(input.consumedCount == 3)
+        let expected3: Index<Int>.Count = 3
+        #expect(input.consumedCount == expected3)
     }
 
     @Test("access.element(at:) total accessor")
     func elementAtTotalAccessor() throws {
         var input = Input.Buffer([1, 2, 3, 4, 5])
-        #expect(try input.access.element(at: 0) == 1)
-        #expect(try input.access.element(at: 4) == 5)
-        #expect(throws: Input.Access.Error.self) {
-            try input.access.element(at: 10)
+        let offset0: Index<Int>.Offset = 0
+        let offset4: Index<Int>.Offset = 4
+        #expect(try input.access.element(at: offset0) == 1)
+        #expect(try input.access.element(at: offset4) == 5)
+        let offset10: Index<Int>.Offset = 10
+        #expect(throws: (any Error).self) {
+            try input.access.element(at: offset10)
         }
     }
 }

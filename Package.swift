@@ -16,6 +16,10 @@ let package = Package(
             name: "Input Primitives",
             targets: ["Input Primitives"]
         ),
+        .library(
+            name: "Input Primitives Test Support",
+            targets: ["Input Primitives Test Support"]
+        ),
     ],
     dependencies: [
         .package(path: "../swift-collection-primitives"),
@@ -33,9 +37,20 @@ let package = Package(
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
             ]
         ),
+        .target(
+            name: "Input Primitives Test Support",
+            dependencies: [
+                "Input Primitives",
+                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
+            ],
+            path: "Tests/Support"
+        ),
         .testTarget(
             name: "Input Primitives Tests",
-            dependencies: ["Input Primitives"]
+            dependencies: [
+                "Input Primitives",
+                "Input Primitives Test Support",
+            ]
         ),
     ],
     swiftLanguageModes: [.v6]

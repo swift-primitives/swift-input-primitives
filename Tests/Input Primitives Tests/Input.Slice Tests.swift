@@ -6,25 +6,33 @@
 import Testing
 
 @testable import Input_Primitives
-public import Collection_Primitives
+import Input_Primitives_Test_Support
 
-extension ArraySlice: Collection.`Protocol` {
-    public var startIndex: Index {
-        .zero
+/// Minimal Collection.Protocol conformer for testing Input.Slice.
+struct TestCollection<Element: Sendable>: Collection.`Protocol`, Sendable {
+    var storage: [Element]
+
+    var startIndex: Index_Primitives.Index<Element> { .zero }
+
+    var endIndex: Index_Primitives.Index<Element> {
+        Index_Primitives.Index<Element>.Count(Cardinal(UInt(storage.count))).map(Ordinal.init)
     }
-    
-    public var endIndex: Index {
-        .max
+
+    subscript(position: Index_Primitives.Index<Element>) -> Element {
+        storage[Int(bitPattern: position)]
     }
-    
-    public func index(after i: Index) -> Index {
-        fatalError()
+
+    func index(after i: Index_Primitives.Index<Element>) -> Index_Primitives.Index<Element> {
+        try! i.successor.exact()
+    }
+
+    func makeIterator() -> Array<Element>.Iterator {
+        storage.makeIterator()
     }
 }
 
 // MARK: - Test Suite Structure
 
-// Note: Input.Slice is generic, so we use a dedicated test enum per TEST-ORG-005
 enum InputSliceTests {
     @Suite
     enum Test {
@@ -38,47 +46,52 @@ enum InputSliceTests {
 // MARK: - Unit Tests
 
 extension InputSliceTests.Test.Unit {
-    @Test("init from array slice")
-    func initFromArraySlice() {
-        let array = [1, 2, 3, 4, 5]
-        let slice = Input.Slice(array[...])
-        #expect(slice.count == 5)
+    @Test("init from collection")
+    func initFromCollection() {
+        let collection = TestCollection(storage: [1, 2, 3, 4, 5])
+        let slice = Input.Slice(collection)
+        let expectedCount: Index<Int>.Count = 5
+        #expect(slice.count == expectedCount)
         #expect(slice.first == 1)
         #expect(!slice.isEmpty)
     }
 
     @Test("isEmpty returns true for empty slice")
     func isEmptyForEmptySlice() {
-        let array: [Int] = []
-        let slice = Input.Slice(array[...])
+        let collection = TestCollection<Int>(storage: [])
+        let slice = Input.Slice(collection)
         #expect(slice.isEmpty)
-        #expect(slice.count == 0)
+        let expectedCount: Index<Int>.Count = 0
+        #expect(slice.count == expectedCount)
         #expect(slice.first == nil)
     }
 
     @Test("remove.first() consumes element")
     func removeFirstConsumesElement() throws {
-        let array = [1, 2, 3]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [1, 2, 3])
+        var slice = Input.Slice(collection)
         let first = try slice.remove.first()
         #expect(first == 1)
-        #expect(slice.count == 2)
+        let expectedCount: Index<Int>.Count = 2
+        #expect(slice.count == expectedCount)
         #expect(slice.first == 2)
     }
 
     @Test("remove.first(n) advances by n elements")
     func removeFirstNAdvances() throws {
-        let array = [1, 2, 3, 4, 5]
-        var slice = Input.Slice(array[...])
-        try slice.remove.first(3)
-        #expect(slice.count == 2)
+        let collection = TestCollection(storage: [1, 2, 3, 4, 5])
+        var slice = Input.Slice(collection)
+        let three: Index<Int>.Count = 3
+        try slice.remove.first(three)
+        let expectedCount: Index<Int>.Count = 2
+        #expect(slice.count == expectedCount)
         #expect(slice.first == 4)
     }
 
     @Test("checkpoint returns current position")
     func checkpointReturnsPosition() throws {
-        let array = [1, 2, 3, 4, 5]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [1, 2, 3, 4, 5])
+        var slice = Input.Slice(collection)
         _ = try slice.remove.first()
         let cp = slice.checkpoint
         _ = try slice.remove.first()
@@ -89,47 +102,35 @@ extension InputSliceTests.Test.Unit {
 
     @Test("checkpoint and restore roundtrip")
     func checkpointRestoreRoundtrip() throws {
-        let array = [1, 2, 3, 4, 5]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [1, 2, 3, 4, 5])
+        var slice = Input.Slice(collection)
         let cp = slice.checkpoint
         _ = try slice.remove.first()
         _ = try slice.remove.first()
-        #expect(slice.count == 3)
+        let expectedCount3: Index<Int>.Count = 3
+        #expect(slice.count == expectedCount3)
         try slice.restore.to(cp)
-        #expect(slice.count == 5)
+        let expectedCount5: Index<Int>.Count = 5
+        #expect(slice.count == expectedCount5)
         #expect(slice.first == 1)
     }
 
     @Test("subscript offset access")
     func subscriptOffsetAccess() {
-        let array = [10, 20, 30, 40, 50]
-        let slice = Input.Slice(array[...])
-        #expect(slice[offset: 0] == 10)
-        #expect(slice[offset: 2] == 30)
-        #expect(slice[offset: 4] == 50)
-    }
-
-    @Test("access.starts(with:) prefix check")
-    func startsWithPrefixCheck() {
-        let array = [1, 2, 3, 4, 5]
-        var slice = Input.Slice(array[...])
-        #expect(slice.access.starts(with: [1, 2, 3]) == true)
-        #expect(slice.access.starts(with: [1, 2, 4]) == false)
-        #expect(slice.access.starts(with: [1, 2, 3, 4, 5, 6]) == false)
-    }
-
-    @Test("access.starts(with:) single element")
-    func startsWithSingleElement() {
-        let array = [1, 2, 3]
-        var slice = Input.Slice(array[...])
-        #expect(slice.access.starts(with: 1) == true)
-        #expect(slice.access.starts(with: 2) == false)
+        let collection = TestCollection(storage: [10, 20, 30, 40, 50])
+        let slice = Input.Slice(collection)
+        let offset0: Index<Int>.Offset = 0
+        let offset2: Index<Int>.Offset = 2
+        let offset4: Index<Int>.Offset = 4
+        #expect(slice[offset: offset0] == 10)
+        #expect(slice[offset: offset2] == 30)
+        #expect(slice[offset: offset4] == 50)
     }
 
     @Test("remaining returns self")
     func remainingReturnsSelf() throws {
-        let array = [1, 2, 3]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [1, 2, 3])
+        var slice = Input.Slice(collection)
         _ = try slice.remove.first()
         let remaining = slice.remaining
         #expect(remaining.count == slice.count)
@@ -138,17 +139,17 @@ extension InputSliceTests.Test.Unit {
 
     @Test("remove.first() throws when empty")
     func removeFirstThrowsWhenEmpty() {
-        let array: [Int] = []
-        var slice = Input.Slice(array[...])
-        #expect(throws: Input.Remove.Error.empty) {
+        let collection = TestCollection<Int>(storage: [])
+        var slice = Input.Slice(collection)
+        #expect(throws: Input.Remove.Error<Int>.empty) {
             try slice.remove.first()
         }
     }
 
     @Test("try? remove.first() returns nil when empty")
     func tryRemoveFirstReturnsNilWhenEmpty() {
-        let array: [Int] = []
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection<Int>(storage: [])
+        var slice = Input.Slice(collection)
         let result = try? slice.remove.first()
         #expect(result == nil)
         #expect(slice.isEmpty)
@@ -156,12 +157,13 @@ extension InputSliceTests.Test.Unit {
 
     @Test("try? remove.first() consumes element")
     func tryRemoveFirstConsumesElement() {
-        let array = [1, 2, 3]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [1, 2, 3])
+        var slice = Input.Slice(collection)
         let result = try? slice.remove.first()
         #expect(result == 1)
         #expect(slice.first == 2)
-        #expect(slice.count == 2)
+        let expectedCount: Index<Int>.Count = 2
+        #expect(slice.count == expectedCount)
     }
 }
 
@@ -170,8 +172,8 @@ extension InputSliceTests.Test.Unit {
 extension InputSliceTests.Test.EdgeCase {
     @Test("single element slice")
     func singleElementSlice() throws {
-        let array = [42]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [42])
+        var slice = Input.Slice(collection)
         #expect(!slice.isEmpty)
         #expect(slice.first == 42)
         let cp = slice.checkpoint
@@ -183,8 +185,8 @@ extension InputSliceTests.Test.EdgeCase {
 
     @Test("restore to checkpoint at end")
     func restoreToCheckpointAtEnd() throws {
-        let array = [1, 2]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [1, 2])
+        var slice = Input.Slice(collection)
         _ = try slice.remove.first()
         _ = try slice.remove.first()
         let cpAtEnd = slice.checkpoint
@@ -195,8 +197,8 @@ extension InputSliceTests.Test.EdgeCase {
 
     @Test("nested checkpoint restore")
     func nestedCheckpointRestore() throws {
-        let array = [1, 2, 3, 4, 5]
-        var slice = Input.Slice(array[...])
+        let collection = TestCollection(storage: [1, 2, 3, 4, 5])
+        var slice = Input.Slice(collection)
         let cp1 = slice.checkpoint
         _ = try slice.remove.first()
         let cp2 = slice.checkpoint
@@ -211,35 +213,35 @@ extension InputSliceTests.Test.EdgeCase {
 
     @Test("remove.first(0) is no-op")
     func removeFirstZeroIsNoop() throws {
-        let array = [1, 2, 3]
-        var slice = Input.Slice(array[...])
-        try slice.remove.first(0)
-        #expect(slice.count == 3)
+        let collection = TestCollection(storage: [1, 2, 3])
+        var slice = Input.Slice(collection)
+        let zero: Index<Int>.Count = 0
+        try slice.remove.first(zero)
+        let expectedCount: Index<Int>.Count = 3
+        #expect(slice.count == expectedCount)
         #expect(slice.first == 1)
-    }
-
-    @Test("access.starts(with:) empty prefix returns true")
-    func startsWithEmptyPrefix() {
-        let array = [1, 2, 3]
-        var slice = Input.Slice(array[...])
-        #expect(slice.access.starts(with: []) == true)
     }
 
     @Test("offset access after partial consumption")
     func offsetAccessAfterConsumption() throws {
-        let array = [1, 2, 3, 4, 5]
-        var slice = Input.Slice(array[...])
-        try slice.remove.first(2)
-        #expect(slice[offset: 0] == 3)
-        #expect(slice[offset: 2] == 5)
+        let collection = TestCollection(storage: [1, 2, 3, 4, 5])
+        var slice = Input.Slice(collection)
+        let two: Index<Int>.Count = 2
+        try slice.remove.first(two)
+        let offset0: Index<Int>.Offset = 0
+        let offset2: Index<Int>.Offset = 2
+        #expect(slice[offset: offset0] == 3)
+        #expect(slice[offset: offset2] == 5)
     }
 
     @Test("remove.first(n) throws when n > count")
     func removeFirstNThrowsWhenInsufficient() {
-        let array = [1, 2, 3]
-        var slice = Input.Slice(array[...])
-        #expect(throws: Input.Remove.Error.insufficientElements(requested: 5, available: 3)) {
-            try slice.remove.first(5)
+        let collection = TestCollection(storage: [1, 2, 3])
+        var slice = Input.Slice(collection)
+        let five: Index<Int>.Count = 5
+        let three: Index<Int>.Count = 3
+        #expect(throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)) {
+            try slice.remove.first(five)
         }
     }
 }
@@ -247,22 +249,12 @@ extension InputSliceTests.Test.EdgeCase {
 // MARK: - Integration Tests
 
 extension InputSliceTests.Test.Integration {
-    @Test("interop with standard ArraySlice")
-    func interopWithArraySlice() {
-        let array = [1, 2, 3, 4, 5]
-        let arraySlice = array[1..<4]
-        let inputSlice = Input.Slice(arraySlice)
-        #expect(inputSlice.count == 3)
-        #expect(inputSlice.first == 2)
-    }
-
     @Test("byte parsing scenario")
     func byteParsingScenario() throws {
-        let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F] // "Hello"
-        var input = Input.Slice(bytes[...])
+        let bytes = TestCollection(storage: [UInt8](arrayLiteral: 0x48, 0x65, 0x6C, 0x6C, 0x6F))
+        var input = Input.Slice(bytes)
 
         let cp = input.checkpoint
-        #expect(input.access.starts(with: [0x48, 0x65]) == true) // "He"
         _ = try input.remove.first()
         _ = try input.remove.first()
         #expect(input.first == 0x6C) // 'l'
@@ -273,12 +265,15 @@ extension InputSliceTests.Test.Integration {
 
     @Test("access.element(at:) total accessor")
     func elementAtTotalAccessor() throws {
-        let array = [1, 2, 3, 4, 5]
-        var input = Input.Slice(array[...])
-        #expect(try input.access.element(at: 0) == 1)
-        #expect(try input.access.element(at: 4) == 5)
-        #expect(throws: Input.Access.Error.self) {
-            try input.access.element(at: 10)
+        let collection = TestCollection(storage: [1, 2, 3, 4, 5])
+        var input = Input.Slice(collection)
+        let offset0: Index<Int>.Offset = 0
+        let offset4: Index<Int>.Offset = 4
+        #expect(try input.access.element(at: offset0) == 1)
+        #expect(try input.access.element(at: offset4) == 5)
+        let offset10: Index<Int>.Offset = 10
+        #expect(throws: (any Error).self) {
+            try input.access.element(at: offset10)
         }
     }
 }

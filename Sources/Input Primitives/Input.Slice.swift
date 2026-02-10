@@ -60,7 +60,7 @@ extension Input {
         /// Derives `Base.Index` from typed position. O(1) for RandomAccessCollection.
         @inlinable
         var rawIndex: Base.Index {
-            base.index(sliceStart, offsetBy: Int(bitPattern: position))
+            sliceStart + Index<Base.Element>.Count(position)
         }
 
         /// Creates a slice cursor over the entire collection.

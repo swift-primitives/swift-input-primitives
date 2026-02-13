@@ -352,6 +352,18 @@ The protocol complexity is the minimum viable abstraction for "consumable cursor
 
 ---
 
+## TestCollection ~Copyable Constraint Poisoning
+
+**Date**: 2026-02-13
+
+**Context**: After making `Input.Stream.Protocol.Element` `~Copyable`, the test suite's `TestCollection<Int>` hits ~Copyable constraint poisoning. The compiler cannot see through `Collection.Protocol`'s `Element: ~Copyable` to recognize that `TestCollection<Int>.Element = Int: Copyable`.
+
+This is the same constraint poisoning pattern previously solved with module splits for storage/buffer/data-structure types. The fix is to split test support into a separate module, or apply the same module-boundary solution used in those packages.
+
+**Applies to**: Test suite, `TestCollection<Int>`, `Input.Slice`
+
+---
+
 ## Topics
 
 ### Related Documents

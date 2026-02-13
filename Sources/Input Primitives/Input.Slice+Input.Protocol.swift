@@ -7,7 +7,7 @@
 
 public import Collection_Primitives
 
-extension Input.Slice: Input.`Protocol` {
+extension Input.Slice: Input.`Protocol` where Base.Element: Copyable {
     public typealias Element = Base.Element
 
     /// Checkpoint type is the typed index (position within slice).

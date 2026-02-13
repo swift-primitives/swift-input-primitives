@@ -8,7 +8,7 @@
 import Index_Primitives
 public import Collection_Primitives
 
-extension Input.Slice: Input.Access.Random {
+extension Input.Slice: Input.Access.Random where Base.Element: Copyable {
     @inlinable
     public subscript(
         offset offset: Index<Element>.Offset

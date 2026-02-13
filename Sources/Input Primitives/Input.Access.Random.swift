@@ -97,7 +97,7 @@ extension Input.Access.Random where Self: ~Copyable {
 
 // MARK: - Property Operations
 
-extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~Copyable {
+extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Copyable {
     /// Accesses the element at the given offset.
     ///
     /// - Parameter offset: Offset from current position (0-indexed).

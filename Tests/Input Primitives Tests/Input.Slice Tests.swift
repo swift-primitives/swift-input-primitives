@@ -12,6 +12,18 @@ import Input_Primitives_Test_Support
 struct TestCollection<Element: Sendable>: Collection.`Protocol`, Sendable {
     var storage: [Element]
 
+    struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
+        var offset: Int
+        let storage: [Element]
+
+        mutating func next() -> Element? {
+            guard offset < storage.count else { return nil }
+            let element = storage[offset]
+            offset += 1
+            return element
+        }
+    }
+
     var startIndex: Index_Primitives.Index<Element> { .zero }
 
     var endIndex: Index_Primitives.Index<Element> {
@@ -26,8 +38,8 @@ struct TestCollection<Element: Sendable>: Collection.`Protocol`, Sendable {
         try! i.successor.exact()
     }
 
-    func makeIterator() -> Array<Element>.Iterator {
-        storage.makeIterator()
+    func makeIterator() -> Iterator {
+        Iterator(offset: 0, storage: storage)
     }
 }
 

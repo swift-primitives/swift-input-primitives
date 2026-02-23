@@ -6,16 +6,22 @@
 //
 
 public import Collection_Primitives
+public import Index_Primitives
 
-extension Input.Slice: Input.`Protocol` where Base.Element: Copyable {
+// Explicit inherited protocol conformance required for conditional conformance.
+extension Input.Slice: Input.Streaming
+where Base: Collection.`Protocol`, Base.Element: Copyable {}
+
+extension Input.Slice: Input.`Protocol`
+where Base: Collection.`Protocol`, Base.Element: Copyable {
     public typealias Element = Base.Element
 
     /// Checkpoint type is the typed index (position within slice).
-    public typealias Checkpoint = Index<Element>
+    public typealias Checkpoint = Index_Primitives.Index<Element>
 
     /// Total count of elements in the slice.
     @inlinable
-    var totalCount: Index<Element>.Count {
+    var totalCount: Index_Primitives.Index<Element>.Count {
         try! sliceStart.distance.forward(to: sliceEnd)
     }
 
@@ -25,8 +31,8 @@ extension Input.Slice: Input.`Protocol` where Base.Element: Copyable {
     }
 
     @inlinable
-    public var count: Index<Element>.Count {
-        totalCount.subtract.saturating(Index<Element>.Count(position))
+    public var count: Index_Primitives.Index<Element>.Count {
+        totalCount.subtract.saturating(Index_Primitives.Index<Element>.Count(position))
     }
 
     @inlinable
@@ -64,7 +70,7 @@ extension Input.Slice: Input.`Protocol` where Base.Element: Copyable {
     }
 
     @inlinable
-    public mutating func advance(by count: Index<Element>.Count) {
+    public mutating func advance(by count: Index_Primitives.Index<Element>.Count) {
         position = position + count  // Pure typed arithmetic!
     }
 

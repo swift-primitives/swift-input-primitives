@@ -23,6 +23,9 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../swift-collection-primitives"),
+        .package(path: "../swift-equation-primitives"),
+        .package(path: "../swift-comparison-primitives"),
+        .package(path: "../swift-hash-primitives"),
         .package(path: "../swift-property-primitives"),
         .package(path: "../swift-identity-primitives"),
         .package(path: "../swift-index-primitives"),
@@ -32,6 +35,9 @@ let package = Package(
             name: "Input Primitives",
             dependencies: [
                 .product(name: "Collection Primitives", package: "swift-collection-primitives"),
+                .product(name: "Equation Primitives", package: "swift-equation-primitives"),
+                .product(name: "Comparison Primitives", package: "swift-comparison-primitives"),
+                .product(name: "Hash Primitives", package: "swift-hash-primitives"),
                 .product(name: "Property Primitives", package: "swift-property-primitives"),
                 .product(name: "Identity Primitives", package: "swift-identity-primitives"),
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
@@ -57,15 +63,17 @@ let package = Package(
 )
 
 for target in package.targets where ![.system, .binary, .plugin, .macro].contains(target.type) {
-    let settings: [SwiftSetting] = [
+    let ecosystem: [SwiftSetting] = [
+        .strictMemorySafety(),
         .enableUpcomingFeature("ExistentialAny"),
         .enableUpcomingFeature("InternalImportsByDefault"),
         .enableUpcomingFeature("MemberImportVisibility"),
         .enableExperimentalFeature("Lifetimes"),
         .enableExperimentalFeature("SuppressedAssociatedTypes"),
-        .enableExperimentalFeature("NonescapableTypes"),
-        .enableExperimentalFeature("LifetimeDependence"),
-        .strictMemorySafety(),
+        .enableExperimentalFeature("SuppressedAssociatedTypesWithDefaults"),
     ]
-    target.swiftSettings = (target.swiftSettings ?? []) + settings
+
+    let package: [SwiftSetting] = []
+
+    target.swiftSettings = (target.swiftSettings ?? []) + ecosystem + package
 }

@@ -18,10 +18,15 @@ extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element
     /// Iterator over the elements of an `Input.Slice`.
     ///
     /// Walks the underlying base collection from `sliceStart` to `sliceEnd`.
+    /// Uses an array buffer for `nextSpan` to provide contiguous span
+    /// access over index-based collection elements.
     public struct CollectionIterator: Sequence.Iterator.`Protocol` {
+        public typealias Element = Base.Element
+
         @usableFromInline let base: Base
         @usableFromInline let sliceEnd: Base.Index
         @usableFromInline var current: Base.Index
+        @usableFromInline var _spanBuffer: [Base.Element] = []
 
         @inlinable
         init(base: Base, start: Base.Index, end: Base.Index) {
@@ -30,6 +35,20 @@ extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element
             self.current = start
         }
 
+        @_lifetime(&self)
+        @inlinable
+        public mutating func nextSpan(maximumCount: Cardinal) -> Span<Base.Element> {
+            _spanBuffer.removeAll(keepingCapacity: true)
+            var remaining = Int(maximumCount.rawValue)
+            while remaining > 0, current < sliceEnd {
+                _spanBuffer.append(base[current])
+                current = base.index(after: current)
+                remaining -= 1
+            }
+            return _spanBuffer.span
+        }
+
+        @_lifetime(self: immortal)
         @inlinable
         public mutating func next() -> Base.Element? {
             guard current < sliceEnd else { return nil }

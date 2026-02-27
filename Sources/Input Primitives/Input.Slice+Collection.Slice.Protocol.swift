@@ -20,6 +20,9 @@ extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element
     /// Walks the underlying base collection from `sliceStart` to `sliceEnd`.
     /// Uses an array buffer for `nextSpan` to provide contiguous span
     /// access over index-based collection elements.
+    ///
+    /// - Note: Uses `_spanBuffer` array accumulation. When the base collection
+    ///   provides a contiguous iterator, delegation could eliminate the buffer.
     public struct CollectionIterator: Sequence.Iterator.`Protocol` {
         public typealias Element = Base.Element
 

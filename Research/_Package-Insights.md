@@ -9,11 +9,6 @@ applies_to: [swift-input-primitives]
 normative: false
 ---
 -->
-
-@Metadata {
-    @TitleHeading("Input Primitives")
-}
-
 Design decisions, implementation patterns, and lessons learned specific to this package.
 
 ## Overview
@@ -364,8 +359,6 @@ This is the same constraint poisoning pattern previously solved with module spli
 
 ---
 
-## Topics
+## Related
 
-### Related Documents
-
-- <doc:Input>
+- Input

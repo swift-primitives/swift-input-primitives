@@ -111,6 +111,19 @@ where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable {
     public var underestimatedCount: Int { Int(bitPattern: count) }
 }
 
+// MARK: - Swift.Collection Bridge
+//
+// Input.Slice already provides startIndex, endIndex, subscript(Index),
+// index(after:), and subscript(Range<Index>) -> Self. Index<Element>
+// is Comparable (Tagged<Element, Ordinal>, Ordinal: Comparable).
+// This empty conformance recovers String(decoding:as:) and
+// Swift.Collection algorithms.
+
+extension Input.Slice: Swift.Collection
+where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable {
+    public typealias SubSequence = Self
+}
+
 // MARK: - Collection.Slice.Protocol
 
 extension Input.Slice: Collection.Slice.`Protocol`

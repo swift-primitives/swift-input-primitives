@@ -18,18 +18,15 @@ extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element
     /// Iterator over the elements of an `Input.Slice`.
     ///
     /// Walks the underlying base collection from `sliceStart` to `sliceEnd`.
-    /// Uses an array buffer for `nextSpan` to provide contiguous span
+    /// Uses an optional inline element for `nextSpan` to provide contiguous span
     /// access over index-based collection elements.
-    ///
-    /// - Note: Uses `_spanBuffer` array accumulation. When the base collection
-    ///   provides a contiguous iterator, delegation could eliminate the buffer.
     public struct CollectionIterator: Sequence.Iterator.`Protocol` {
         public typealias Element = Base.Element
 
         @usableFromInline let base: Base
         @usableFromInline let sliceEnd: Base.Index
         @usableFromInline var current: Base.Index
-        @usableFromInline var _spanBuffer: [Base.Element] = []
+        @usableFromInline var _element: Base.Element? = nil
 
         @inlinable
         init(base: Base, start: Base.Index, end: Base.Index) {
@@ -41,14 +38,22 @@ extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element
         @_lifetime(&self)
         @inlinable
         public mutating func nextSpan(maximumCount: Cardinal) -> Span<Base.Element> {
-            _spanBuffer.removeAll(keepingCapacity: true)
-            var remaining = Int(maximumCount.rawValue)
-            while remaining > 0, current < sliceEnd {
-                _spanBuffer.append(base[current])
-                current = base.index(after: current)
-                remaining -= 1
+            let ptr = unsafe withUnsafeMutablePointer(to: &_element) { p in
+                unsafe UnsafePointer<Base.Element>(
+                    unsafe UnsafeRawPointer(p).assumingMemoryBound(to: Base.Element.self)
+                )
             }
-            return _spanBuffer.span
+            guard maximumCount > .zero else {
+                let span = unsafe Span(_unsafeStart: ptr, count: 0)
+                return unsafe _overrideLifetime(span, mutating: &self)
+            }
+            guard let value = next() else {
+                let span = unsafe Span(_unsafeStart: ptr, count: 0)
+                return unsafe _overrideLifetime(span, mutating: &self)
+            }
+            _element = value
+            let span = unsafe Span(_unsafeStart: ptr, count: 1)
+            return unsafe _overrideLifetime(span, mutating: &self)
         }
 
         @_lifetime(self: immortal)

@@ -15,6 +15,27 @@ struct TestCollection<Element: Sendable>: Collection.`Protocol`, Sendable {
     struct Iterator: Sequence.Iterator.`Protocol`, IteratorProtocol {
         var offset: Int
         let storage: [Element]
+        var _element: Element? = nil
+
+        @_lifetime(&self)
+        mutating func nextSpan(maximumCount: Cardinal) -> Span<Element> {
+            let ptr = unsafe withUnsafeMutablePointer(to: &_element) { p in
+                unsafe UnsafePointer<Element>(
+                    unsafe UnsafeRawPointer(p).assumingMemoryBound(to: Element.self)
+                )
+            }
+            guard maximumCount > .zero else {
+                let span = unsafe Span(_unsafeStart: ptr, count: 0)
+                return unsafe _overrideLifetime(span, mutating: &self)
+            }
+            guard let value = next() else {
+                let span = unsafe Span(_unsafeStart: ptr, count: 0)
+                return unsafe _overrideLifetime(span, mutating: &self)
+            }
+            _element = value
+            let span = unsafe Span(_unsafeStart: ptr, count: 1)
+            return unsafe _overrideLifetime(span, mutating: &self)
+        }
 
         mutating func next() -> Element? {
             guard offset < storage.count else { return nil }

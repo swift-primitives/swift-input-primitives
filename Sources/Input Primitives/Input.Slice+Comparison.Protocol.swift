@@ -6,7 +6,7 @@
 //
 
 public import Collection_Primitives
-public import Comparison_Primitives
+internal import Comparison_Primitives
 
 extension Input.Slice: Comparison.`Protocol`
 where Base: Collection.`Protocol` & Copyable, Base.Element: Comparison.`Protocol` & Copyable {

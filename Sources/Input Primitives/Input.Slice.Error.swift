@@ -6,7 +6,7 @@
 //
 
 public import Collection_Primitives
-public import Index_Primitives
+internal import Index_Primitives
 
 extension Input.Slice where Base: Collection.`Protocol` {
     /// Errors for slice construction.

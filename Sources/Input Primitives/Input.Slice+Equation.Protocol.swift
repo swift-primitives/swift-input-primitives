@@ -6,7 +6,7 @@
 //
 
 public import Collection_Primitives
-public import Equation_Primitives
+internal import Equation_Primitives
 
 extension Input.Slice: Equation.`Protocol`
 where Base: Collection.`Protocol` & Copyable, Base.Element: Equation.`Protocol` & Copyable {

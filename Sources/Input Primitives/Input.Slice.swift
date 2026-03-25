@@ -97,12 +97,12 @@ extension Input.Slice where Base: Collection.`Protocol` {
     /// The current position as a typed index (relative to slice start).
     @usableFromInline
     var position: Index_Primitives.Index<Base.Element> {
-        @inline(__always) get {
+        @inline(always) get {
             Index_Primitives.Index<Base.Element>(
                 __unchecked: (), Ordinal(UInt(bitPattern: _position))
             )
         }
-        @inline(__always) set {
+        @inline(always) set {
             _position = Int(bitPattern: newValue)
         }
     }

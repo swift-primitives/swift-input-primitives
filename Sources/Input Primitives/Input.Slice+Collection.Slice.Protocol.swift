@@ -56,7 +56,6 @@ extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element
             return unsafe _overrideLifetime(span, mutating: &self)
         }
 
-        @_lifetime(self: immortal)
         @inlinable
         public mutating func next() -> Base.Element? {
             guard current < sliceEnd else { return nil }

@@ -141,7 +141,7 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     /// - Returns: `true` if remaining input starts with element.
     /// - Complexity: O(1)
     @inlinable
-    public func starts(with element: Base.Element) -> Bool {
+    public func starts(with element: borrowing Base.Element) -> Bool {
         unsafe !base.pointee.isEmpty && base.pointee[offset: Index<Base.Element>.Offset(0)] == element
     }
 }

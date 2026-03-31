@@ -140,8 +140,17 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     /// - Parameter element: Element to compare against.
     /// - Returns: `true` if remaining input starts with element.
     /// - Complexity: O(1)
+    // SE-0499: Swift.Equatable no longer implies Copyable in Swift 6.4.
+    // The borrowing parameter lets this work for ~Copyable Equatable elements.
+#if compiler(>=6.4)
     @inlinable
     public func starts(with element: borrowing Base.Element) -> Bool {
         unsafe !base.pointee.isEmpty && base.pointee[offset: Index<Base.Element>.Offset(0)] == element
     }
+#else
+    @inlinable
+    public func starts(with element: Base.Element) -> Bool {
+        unsafe !base.pointee.isEmpty && base.pointee[offset: Index<Base.Element>.Offset(0)] == element
+    }
+#endif
 }

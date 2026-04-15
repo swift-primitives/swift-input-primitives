@@ -115,4 +115,4 @@ extension Input.Buffer {
 
 // MARK: - Sendable
 
-extension Input.Buffer: @unchecked Sendable where Storage: Sendable, Storage.Index: Sendable {}
+extension Input.Buffer: @unsafe @unchecked Sendable where Storage: Sendable, Storage.Index: Sendable {}

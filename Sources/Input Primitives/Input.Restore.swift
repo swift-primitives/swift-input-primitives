@@ -5,6 +5,7 @@
 //  Namespace and accessor operations for checkpoint restoration.
 //
 
+
 extension Input {
     /// Namespace for checkpoint restoration operations.
     ///
@@ -49,10 +50,10 @@ extension Property.View where Tag == Input.Restore, Base: Input.`Protocol` & ~Co
     ///   out of bounds or was not created from this input instance.
     @inlinable
     public func to(_ checkpoint: Base.Checkpoint) throws(Input.Restore.Error) {
-        guard unsafe base.pointee.isValid(checkpoint) else {
+        guard unsafe base.value.isValid(checkpoint) else {
             throw .invalidCheckpoint
         }
-        unsafe base.pointee.setPosition(to: checkpoint)
+        unsafe base.value.setPosition(to: checkpoint)
     }
 
     /// Sets position directly without validation.
@@ -61,6 +62,6 @@ extension Property.View where Tag == Input.Restore, Base: Input.`Protocol` & ~Co
     ///   and represents a valid position.
     @inlinable
     public func to(__unchecked: Void, _ checkpoint: Base.Checkpoint) {
-        unsafe base.pointee.setPosition(to: checkpoint)
+        unsafe base.value.setPosition(to: checkpoint)
     }
 }

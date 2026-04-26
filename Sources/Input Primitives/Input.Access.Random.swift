@@ -7,6 +7,7 @@
 
 // MARK: - Namespace
 
+
 extension Input {
     /// Namespace for random access types and operations.
     ///
@@ -108,11 +109,11 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     public func element(
         at offset: Index<Base.Element>.Offset
     ) throws(Input.Access.Error<Base.Element>) -> Base.Element {
-        let count = unsafe base.pointee.count
+        let count = unsafe base.value.count
         guard offset >= .zero && offset < count else {
             throw .outOfBounds(offset: offset, count: count)
         }
-        return unsafe base.pointee[offset: offset]
+        return unsafe base.value[offset: offset]
     }
 }
 
@@ -128,9 +129,9 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
     public func starts<Prefix: Swift.Collection>(with prefix: Prefix) -> Bool
     where Prefix.Element == Base.Element {
         let prefixCount = try! Index<Base.Element>.Count(prefix.count)
-        guard unsafe prefixCount <= base.pointee.count else { return false }
+        guard unsafe prefixCount <= base.value.count else { return false }
         for (offset, element) in prefix.enumerated() {
-            if unsafe base.pointee[offset: Index<Base.Element>.Offset(offset)] != element { return false }
+            if unsafe base.value[offset: Index<Base.Element>.Offset(offset)] != element { return false }
         }
         return true
     }
@@ -145,12 +146,12 @@ extension Property.View where Tag == Input.Access, Base: Input.Access.Random & ~
 #if compiler(>=6.4)
     @inlinable
     public func starts(with element: borrowing Base.Element) -> Bool {
-        unsafe !base.pointee.isEmpty && base.pointee[offset: Index<Base.Element>.Offset(0)] == element
+        unsafe !base.value.isEmpty && base.value[offset: Index<Base.Element>.Offset(0)] == element
     }
 #else
     @inlinable
     public func starts(with element: Base.Element) -> Bool {
-        unsafe !base.pointee.isEmpty && base.pointee[offset: Index<Base.Element>.Offset(0)] == element
+        unsafe !base.value.isEmpty && base.value[offset: Index<Base.Element>.Offset(0)] == element
     }
 #endif
 }

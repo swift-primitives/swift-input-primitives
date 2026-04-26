@@ -5,6 +5,7 @@
 //  Namespace and accessor operations for element removal.
 //
 
+
 extension Input {
     /// Namespace for element removal operations.
     ///
@@ -47,7 +48,7 @@ extension Property.View where Tag == Input.Remove, Base: Input.Streaming & ~Copy
     @discardableResult
     public func first() throws(Input.Remove.Error<Base.Element>) -> Base.Element {
         do {
-            return try unsafe base.pointee.advance()
+            return try unsafe base.value.advance()
         } catch {
             throw .empty
         }
@@ -62,7 +63,7 @@ extension Property.View where Tag == Input.Remove, Base: Input.Streaming & ~Copy
     @inlinable
     @discardableResult
     public func first(__unchecked: Void) -> Base.Element {
-        try! unsafe base.pointee.advance()
+        try! unsafe base.value.advance()
     }
 }
 
@@ -76,11 +77,11 @@ extension Property.View where Tag == Input.Remove, Base: Input.`Protocol` & ~Cop
     ///   if `count` exceeds the remaining elements.
     @inlinable
     public func first(_ count: Index<Base.Element>.Count) throws(Input.Remove.Error<Base.Element>) {
-        let available = unsafe base.pointee.count
+        let available = unsafe base.value.count
         guard count <= available else {
             throw .insufficientElements(requested: count, available: available)
         }
-        unsafe base.pointee.advance(by: count)
+        unsafe base.value.advance(by: count)
     }
 
     /// Advances cursor by count directly without validation.
@@ -88,6 +89,6 @@ extension Property.View where Tag == Input.Remove, Base: Input.`Protocol` & ~Cop
     /// - Precondition: `count <= self.count`
     @inlinable
     public func first(__unchecked: Void, _ count: Index<Base.Element>.Count) {
-        unsafe base.pointee.advance(by: count)
+        unsafe base.value.advance(by: count)
     }
 }

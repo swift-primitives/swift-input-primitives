@@ -1,0 +1,58 @@
+{
+  "$schema": "https://swift-institute.org/schemas/experiments-index-v1.json",
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-04-30",
+  "title": "Experiments Index",
+  "blurb": "",
+  "scope": "swift-input-primitives (swift-primitives)",
+  "experiments": [
+    {
+      "directory": "noncopyable-streaming",
+      "displayName": "noncopyable-streaming",
+      "purpose": "Can Input.Stream.Protocol work with ~Copyable elements via _read?",
+      "date": "2026-01-23",
+      "toolchain": "Swift 6.2.3",
+      "status": "SUPERSEDED",
+      "statusDetail": "Input.Stream.Protocol with ~Copyable Element shipped in swift-input-primitives (Phase 1b stale-triage 2026-04-30)",
+      "statusRaw": "CONFIRMED (PARTIALLY) -> SUPERSEDED (Phase 1b stale-triage 2026-04-30)",
+      "supersededBy": "Input.Stream.Protocol with ~Copyable Element shipped in swift-input-primitives",
+      "crossRefs": []
+    },
+    {
+      "directory": "consuming-protocol-return",
+      "displayName": "consuming-protocol-return",
+      "purpose": "Can protocol methods return ~Copyable values via consuming semantics?",
+      "date": "2026-02-13",
+      "toolchain": "Swift 6.2.3",
+      "status": "SUPERSEDED",
+      "statusDetail": "consuming-return pattern shipped in Input.Stream.Protocol (Phase 1b stale-triage 2026-04-30)",
+      "statusRaw": "CONFIRMED -> SUPERSEDED (Phase 1b stale-triage 2026-04-30)",
+      "supersededBy": "consuming-return pattern shipped in Input.Stream.Protocol",
+      "crossRefs": []
+    },
+    {
+      "directory": "read-accessor-noncopyable-optional",
+      "displayName": "read-accessor-noncopyable-optional",
+      "purpose": "Can _read yield through Optional<~Copyable>?",
+      "date": "2026-02-13",
+      "toolchain": "Swift 6.2.3",
+      "status": "REFUTED",
+      "statusDetail": null,
+      "statusRaw": "REFUTED",
+      "supersededBy": null,
+      "crossRefs": []
+    },
+    {
+      "directory": "constraint-poisoning-module-split",
+      "displayName": "constraint-poisoning-module-split",
+      "purpose": "Does ~Escapable on result builder generic param fix constraint poisoning?",
+      "date": "2026-02-13",
+      "toolchain": "Swift 6.2.3",
+      "status": "CONFIRMED",
+      "statusDetail": null,
+      "statusRaw": "CONFIRMED",
+      "supersededBy": null,
+      "crossRefs": []
+    }
+  ]
+}

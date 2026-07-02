@@ -1,6 +1,6 @@
 # .github/metadata.yaml
 # Triaged by AI-assisted bulk pass (2026-04-29).
-description: "Input types for Swift."
+description: "Checkpointable, backtracking cursor protocol with zero-copy and owned-buffer conformers backing parser combinators and binary cursors for Swift."
 topics:
   - primitives
   - input

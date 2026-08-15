@@ -53,6 +53,7 @@ extension Property.Inout where Tag == Input.Remove, Base: Input.Streaming & ~Cop
         }
     }
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
     /// Advances cursor directly without validation.
     ///
     /// - Precondition: `!isEmpty`
@@ -91,6 +92,7 @@ extension Property.Inout where Tag == Input.Remove, Base: Input.`Protocol` & ~Co
         base.value.advance(by: count)
     }
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
     /// Advances cursor by count directly without validation.
     ///
     /// - Precondition: `count <= self.count`

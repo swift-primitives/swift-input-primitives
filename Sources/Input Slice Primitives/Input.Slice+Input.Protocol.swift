@@ -10,10 +10,16 @@ public import Index_Primitives
 
 // Explicit inherited protocol conformance required for conditional conformance.
 extension Input.Slice: Input.Streaming
-where Base: Collection.`Protocol`, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {}
+where
+    Base: Collection.`Protocol`, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{}
 
 extension Input.Slice: Input.`Protocol`
-where Base: Collection.`Protocol`, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol`, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// The element type yielded by the slice (forwarded from `Base`).
     public typealias Element = Base.Element
 

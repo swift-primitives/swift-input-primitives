@@ -10,7 +10,10 @@ internal import Hash_Primitives
 public import Index_Primitives
 
 extension Input.Slice: Hash.`Protocol`
-where Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// Feeds the slice's elements into the given hasher in order.
     @inlinable
     @_disfavoredOverload
@@ -27,5 +30,8 @@ where Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Co
 // `hash(into:)` witness above satisfies it). Ref: Research/se-0499-…md Addendum (2026-06-01).
 #if swift(>=6.4)
     extension Input.Slice: Swift.Hashable
-    where Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable, Base.Index == Index_Primitives.Index<Base.Element> {}
+    where
+        Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable,
+        Base.Index == Index_Primitives.Index<Base.Element>
+    {}
 #endif

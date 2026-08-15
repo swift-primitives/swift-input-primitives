@@ -88,7 +88,8 @@ extension Input.Access.Random where Self: ~Copyable {
 
 // MARK: - Property Operations
 
-extension Property.Inout where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Copyable {
+extension Property.Inout
+where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Copyable {
     /// Accesses the element at the given offset.
     ///
     /// - Parameter offset: Offset from current position (0-indexed).
@@ -107,7 +108,8 @@ extension Property.Inout where Tag == Input.Access, Base: Input.Access.Random & 
     }
 }
 
-extension Property.Inout where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Equatable {
+extension Property.Inout
+where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Equatable {
     /// Checks if remaining elements start with the given prefix.
     ///
     /// - Parameter prefix: Collection to compare against.

@@ -351,7 +351,9 @@ extension Input.`Slice Test`.`Edge Case` {
         var slice = Input.Slice(collection)
         let five: Index<Int>.Count = 5
         let three: Index<Int>.Count = 3
-        #expect(throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)) {
+        #expect(
+            throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)
+        ) {
             try slice.remove.first(five)
         }
     }

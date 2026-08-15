@@ -17,7 +17,11 @@ public import Iterator_Primitive
 
 // MARK: - Iterator
 
-extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+extension Input.Slice
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// Iterator over the elements of an `Input.Slice`.
     ///
     /// Walks the underlying base collection from `_lower` to `_upper` via scalar
@@ -39,7 +43,11 @@ extension Input.Slice where Base: Collection.`Protocol` & Copyable, Base.Element
 
 // MARK: - Iterator: scalar next() (Iterator.Protocol witness)
 
-extension Input.Slice.Iterator where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+extension Input.Slice.Iterator
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// The element type yielded by the iterator.
     public typealias Element = Base.Element
 
@@ -56,7 +64,10 @@ extension Input.Slice.Iterator where Base: Collection.`Protocol` & Copyable, Bas
 // MARK: - Sequence.Protocol
 
 extension Input.Slice: Iterable
-where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     // reason: comma spacing inside @_implements conflicts with SwiftLint comma rule
     // swift-format-ignore
     /// The scalar slice iterator wrapped in the materializing adapter for bulk span access.
@@ -83,7 +94,10 @@ where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index
 // MARK: - Collection.Protocol
 
 extension Input.Slice: Collection.`Protocol`
-where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// The position of the first element in the slice (the current cursor position).
     @inlinable
     public var startIndex: Index_Primitives.Index<Element> { position }
@@ -121,10 +135,16 @@ where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index
 // These empty conformances recover for-in, zip, and Array(...) syntax.
 
 extension Input.Slice.Iterator: IteratorProtocol
-where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {}
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{}
 
 extension Input.Slice: Swift.Sequence
-where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// Returns the exact slice count as the underestimate hint.
     public var underestimatedCount: Int { Int(bitPattern: count) }
 }
@@ -138,7 +158,10 @@ where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index
 // Swift.Collection algorithms.
 
 extension Input.Slice: Swift.Collection
-where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// Sub-sequence type: an `Input.Slice` over the same `Base`.
     public typealias SubSequence = Self
 
@@ -155,7 +178,10 @@ where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index
 // MARK: - Collection.Slice.Protocol
 
 extension Input.Slice: Collection.Slice.`Protocol`
-where Base: Collection.`Protocol` & Copyable, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// Returns a sub-slice spanning the given bounds.
     @inlinable
     public subscript(bounds: Range<Index_Primitives.Index<Element>>) -> Self {

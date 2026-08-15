@@ -9,7 +9,10 @@ public import Collection_Primitives
 public import Index_Primitives
 
 extension Input.Slice: Input.Access.Random
-where Base: Collection.`Protocol`, Base.Element: Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol`, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// Accesses the element at the given offset from the current position.
     ///
     /// - Precondition: `offset >= 0 && offset < count`.

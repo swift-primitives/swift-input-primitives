@@ -10,7 +10,10 @@ internal import Comparison_Primitives
 public import Index_Primitives
 
 extension Input.Slice: Comparison.`Protocol`
-where Base: Collection.`Protocol` & Copyable, Base.Element: Comparison.`Protocol` & Copyable, Base.Index == Index_Primitives.Index<Base.Element> {
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Comparison.`Protocol` & Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{
     /// Lexicographic ordering: compares elements pairwise, falling back to count.
     @inlinable
     @_disfavoredOverload

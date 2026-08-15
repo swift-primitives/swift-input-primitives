@@ -281,7 +281,9 @@ extension Input.`Buffer Test`.`Edge Case` {
         var buffer = Input.Buffer([1, 2, 3])
         let five: Index<Int>.Count = 5
         let three: Index<Int>.Count = 3
-        #expect(throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)) {
+        #expect(
+            throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)
+        ) {
             try buffer.remove.first(five)
         }
     }

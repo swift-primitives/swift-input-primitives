@@ -93,7 +93,8 @@ extension Input.Slice: Sendable where Base: Sendable {}
 
 // MARK: - Typed Accessors
 
-extension Input.Slice where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+extension Input.Slice
+where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
     /// The raw lower bound of the slice in base (fixed at construction).
     @usableFromInline
     var _lower: Base.Index {
@@ -130,7 +131,8 @@ extension Input.Slice where Base: Collection.`Protocol`, Base.Index == Index_Pri
 
 // MARK: - Public Initializers
 
-extension Input.Slice where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+extension Input.Slice
+where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
     /// Creates a slice cursor over the entire collection.
     ///
     /// - Parameter base: The collection to wrap.

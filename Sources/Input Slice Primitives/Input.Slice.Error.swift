@@ -8,7 +8,8 @@
 public import Collection_Primitives
 public import Index_Primitives
 
-extension Input.Slice where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+extension Input.Slice
+where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
     /// Errors for slice construction.
     ///
     /// Thrown when constructing a slice with invalid bounds.
@@ -30,7 +31,8 @@ extension Input.Slice where Base: Collection.`Protocol`, Base.Index == Index_Pri
 
 // MARK: - Validated Init
 
-extension Input.Slice where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+extension Input.Slice
+where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
     /// Creates a slice cursor with explicit bounds.
     ///
     /// - Parameters:

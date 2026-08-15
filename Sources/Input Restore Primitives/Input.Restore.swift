@@ -55,6 +55,7 @@ extension Property.Inout where Tag == Input.Restore, Base: Input.`Protocol` & ~C
         base.value.seek(to: checkpoint)
     }
 
+    // swift-format-ignore: AlwaysUseLowerCamelCase
     /// Sets position directly without validation.
     ///
     /// - Precondition: `checkpoint` was created from this input instance

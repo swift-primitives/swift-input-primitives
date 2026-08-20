@@ -25,13 +25,8 @@ where
     }
 }
 
-// Swift 6.4+: `Hash.Protocol` REFINES `Swift.Hashable`; a conditional conformance to it
-// does not synthesize the inherited `Swift.Hashable`, so declare it explicitly (the
-// `hash(into:)` witness above satisfies it). Ref: Research/se-0499-…md Addendum (2026-06-01).
-#if swift(>=6.4)
-    extension Input.Slice: Swift.Hashable
-    where
-        Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable,
-        Base.Index == Index_Primitives.Index<Base.Element>
-    {}
-#endif
+extension Input.Slice: Swift.Hashable
+where
+    Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{}

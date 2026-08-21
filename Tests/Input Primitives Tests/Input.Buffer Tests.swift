@@ -1,15 +1,8 @@
-//
-//  Input.Buffer Tests.swift
-//  swift-input-primitives
-//
-
 import Byte_Primitives
 import Input_Primitives_Test_Support
 import Testing
 
 @testable import Input_Primitives
-
-// MARK: - Test Suite Structure
 
 extension Input {
     @Suite
@@ -20,8 +13,6 @@ extension Input {
         @Suite(.serialized) struct Performance {}
     }
 }
-
-// MARK: - Unit Tests
 
 extension Input.`Buffer Test`.Unit {
     @Test
@@ -177,8 +168,6 @@ extension Input.`Buffer Test`.Unit {
     }
 }
 
-// MARK: - Edge Cases
-
 extension Input.`Buffer Test`.`Edge Case` {
     @Test
     func `single element buffer`() throws(Input.Remove.Error<Int>) {
@@ -298,18 +287,16 @@ extension Input.`Buffer Test`.`Edge Case` {
     }
 }
 
-// MARK: - Integration Tests
-
 extension Input.`Buffer Test`.Integration {
     @Test
     func `byte parsing scenario`() throws(Input.Remove.Error<Byte>) {
-        let bytes: [Byte] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]  // "Hello"
+        let bytes: [Byte] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]
         var input = Input.Buffer(bytes)
 
         let cp = input.checkpoint
         _ = try input.remove.first()
         _ = try input.remove.first()
-        #expect(input.first == 0x6C)  // 'l'
+        #expect(input.first == 0x6C)
 
         do throws(Input.Restore.Error) {
             try input.restore.to(cp)
@@ -317,7 +304,7 @@ extension Input.`Buffer Test`.Integration {
             Issue.record("restore.to failed: \(error)")
             return
         }
-        #expect(input.first == 0x48)  // 'H'
+        #expect(input.first == 0x48)
     }
 
     @Test
@@ -349,12 +336,7 @@ extension Input.`Buffer Test`.Integration {
         var input = Input.Buffer([1, 2, 3, 4, 5])
         let offset0: Index<Int>.Offset = 0
         let offset4: Index<Int>.Offset = 4
-        // Move `try` out of `#expect()` macro expansion — embedded typed-throws
-        // closures inside the macro hit a Swift 6.3 Windows + 6.4-dev SIL
-        // verification failure ("throw operand type does not match error result
-        // type of function"). The bug is in macro+typed-throws+Property.Inout
-        // generic interaction; the workaround is to bind the try-result locally
-        // and assert on the bare value.
+
         let v0 = try input.access.element(at: offset0)
         let v4 = try input.access.element(at: offset4)
         #expect(v0 == 1)

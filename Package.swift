@@ -12,7 +12,7 @@ let package = Package(
         .visionOS(.v27),
     ],
     products: [
-        // MARK: - Sub-targets
+
         .library(
             name: "Input Access Primitives",
             targets: ["Input Access Primitives"]
@@ -46,13 +46,11 @@ let package = Package(
             targets: ["Input Stream Primitives"]
         ),
 
-        // MARK: - Umbrella
         .library(
             name: "Input Primitives",
             targets: ["Input Primitives"]
         ),
 
-        // MARK: - Test Support
         .library(
             name: "Input Primitives Test Support",
             targets: ["Input Primitives Test Support"]
@@ -97,12 +95,11 @@ let package = Package(
         ),
     ],
     targets: [
-        // MARK: - Namespace
+
         .target(
             name: "Input Namespace Primitives"
         ),
 
-        // MARK: - Stream
         .target(
             name: "Input Stream Primitives",
             dependencies: [
@@ -110,7 +107,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Protocol
         .target(
             name: "Input Protocol Primitives",
             dependencies: [
@@ -120,7 +116,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Access
         .target(
             name: "Input Access Primitives",
             dependencies: [
@@ -131,7 +126,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Remove
         .target(
             name: "Input Remove Primitives",
             dependencies: [
@@ -143,7 +137,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Restore
         .target(
             name: "Input Restore Primitives",
             dependencies: [
@@ -153,7 +146,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Buffer
         .target(
             name: "Input Buffer Primitives",
             dependencies: [
@@ -165,7 +157,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Slice
         .target(
             name: "Input Slice Primitives",
             dependencies: [
@@ -182,7 +173,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Umbrella
         .target(
             name: "Input Primitives",
             dependencies: [
@@ -197,7 +187,6 @@ let package = Package(
             ]
         ),
 
-        // MARK: - Test Support
         .target(
             name: "Input Primitives Test Support",
             dependencies: [

@@ -1,6 +1,3 @@
-// exports.swift
-// Re-export dependencies for consumers of Input Slice Primitives.
-
 @_exported public import Collection_Primitives
 @_exported public import Comparison_Primitives
 @_exported public import Equation_Primitives

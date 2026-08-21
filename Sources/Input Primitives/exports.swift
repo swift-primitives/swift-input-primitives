@@ -1,6 +1,3 @@
-// exports.swift
-// Umbrella re-exports for the Input Primitives composite product.
-
 @_exported public import Input_Access_Primitives
 @_exported public import Input_Buffer_Primitives
 @_exported public import Input_Namespace_Primitives

@@ -1,8 +1,3 @@
-//
-//  Input.Slice Tests.swift
-//  swift-input-primitives
-//
-
 import Input_Primitives_Test_Support
 import Iterable
 import Iterator_Chunk_Primitives
@@ -11,12 +6,9 @@ import Testing
 
 @testable import Input_Primitives
 
-/// Minimal Collection.Protocol conformer for testing Input.Slice.
 private struct TestCollection<Element: Sendable>: Sendable {
     var storage: [Element]
 }
-
-// MARK: - TestCollection.Iterator
 
 extension TestCollection {
     struct Iterator {
@@ -26,19 +18,6 @@ extension TestCollection {
     }
 }
 
-// MARK: - TestCollection.Iterator: Iterator.Chunk.Protocol witnesses
-
-// swiftlint:disable:next workaround_marker_present
-// WORKAROUND: dropped the stdlib `IteratorProtocol` conformance from this extension.
-// WHY: Swift 6.3.2 (+Asserts, e.g. the Windows CI toolchain) crashes type-checking it —
-//      Assertion `getEffects(req).contains(getEffects(witness))` (TypeCheckProtocol.cpp:1311):
-//      the chunk protocol's `where Element: Copyable` derived `next() throws(Never)` competes
-//      with the non-throwing `IteratorProtocol.next()` requirement and trips an effects check.
-//      The conformance was unused by these tests (no stdlib for-in / .next() over the Iterator;
-//      Iterable needs only Iterator.Chunk.Protocol, not stdlib IteratorProtocol).
-// TRACKING: swift-institute/Issues/swift-issue-typed-throws-never-witness-effects-assertion
-// WHEN TO REMOVE: fixed on Swift 6.5-dev — restore `, IteratorProtocol` once the Windows CI
-//      toolchain ships a Swift carrying the fix.
 extension TestCollection.Iterator: Iterator.Chunk.`Protocol` {
     typealias Failure = Never
 
@@ -70,8 +49,6 @@ extension TestCollection.Iterator: Iterator.Chunk.`Protocol` {
     }
 }
 
-// MARK: - TestCollection: Collection.Protocol witnesses
-
 extension TestCollection: Collection.`Protocol` {
     var startIndex: Index_Primitives.Index<Element> { .zero }
 
@@ -87,9 +64,7 @@ extension TestCollection: Collection.`Protocol` {
         do throws(Ordinal.Error) {
             return try i.successor.exact()
         } catch {
-            // SAFETY: Collection.Protocol's `index(after:)` precondition requires
-            // `i < endIndex`, so the successor cannot overflow. Sentinel for the
-            // never-reached path.
+
             return endIndex
         }
     }
@@ -98,11 +73,6 @@ extension TestCollection: Collection.`Protocol` {
         Iterator(offset: 0, storage: storage)
     }
 }
-
-// TestCollection conforms Iterable via the Collection.Protocol: Iterable refine edge
-// (its makeIterator above is the witness); no explicit conformance needed.
-
-// MARK: - Test Suite Structure
 
 extension Input {
     @Suite
@@ -113,8 +83,6 @@ extension Input {
         @Suite(.serialized) struct Performance {}
     }
 }
-
-// MARK: - Unit Tests
 
 extension Input.`Slice Test`.Unit {
     @Test
@@ -258,8 +226,6 @@ extension Input.`Slice Test`.Unit {
     }
 }
 
-// MARK: - Edge Cases
-
 extension Input.`Slice Test`.`Edge Case` {
     @Test
     func `single element slice`() throws(Input.Remove.Error<Int>) {
@@ -359,8 +325,6 @@ extension Input.`Slice Test`.`Edge Case` {
     }
 }
 
-// MARK: - Integration Tests
-
 extension Input.`Slice Test`.Integration {
     @Test
     func `byte parsing scenario`() throws(Input.Remove.Error<UInt8>) {
@@ -370,7 +334,7 @@ extension Input.`Slice Test`.Integration {
         let cp = input.checkpoint
         _ = try input.remove.first()
         _ = try input.remove.first()
-        #expect(input.first == 0x6C)  // 'l'
+        #expect(input.first == 0x6C)
 
         do throws(Input.Restore.Error) {
             try input.restore.to(cp)
@@ -378,7 +342,7 @@ extension Input.`Slice Test`.Integration {
             Issue.record("restore.to failed: \(error)")
             return
         }
-        #expect(input.first == 0x48)  // 'H'
+        #expect(input.first == 0x48)
     }
 
     @Test
@@ -387,11 +351,7 @@ extension Input.`Slice Test`.Integration {
         var input = Input.Slice(collection)
         let offset0: Index<Int>.Offset = 0
         let offset4: Index<Int>.Offset = 4
-        // Move `try` out of `#expect()` macro expansion — embedded typed-throws
-        // closures inside the macro hit a Swift 6.3 Windows + 6.4-dev SIL
-        // verification failure ("throw operand type does not match error result
-        // type of function"). See Input.Buffer Tests.swift for the same
-        // workaround on the buffer-cursor side.
+
         let v0 = try input.access.element(at: offset0)
         let v4 = try input.access.element(at: offset4)
         #expect(v0 == 1)

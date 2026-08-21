@@ -62,7 +62,7 @@ extension Input.Stream {
     /// (``Input/Buffer``, ``Input/Slice``) for Copyable element types.
     public protocol `Protocol`: ~Copyable {
         /// The element type of the input.
-        associatedtype Element: ~Copyable
+        associatedtype Element: ~Copyable & Escapable
 
         /// Whether the input is empty.
         var isEmpty: Bool { get }

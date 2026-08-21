@@ -138,7 +138,8 @@ where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: 
     }
 
     // SE-0499: Swift.Equatable no longer implies Copyable in Swift 6.4.
-    // The borrowing parameter lets this work for ~Copyable Equatable elements.
+    // The consuming parameter transfers a ~Copyable value into Equatable's
+    // by-value comparison without requiring an implicit copy.
     #if compiler(>=6.4)
         /// Checks if the input starts with the given element.
         ///
@@ -146,7 +147,7 @@ where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: 
         /// - Returns: `true` if remaining input starts with element.
         /// - Complexity: O(1)
         @inlinable
-        public func starts(with element: borrowing Base.Element) -> Bool {
+        public func starts(with element: consuming Base.Element) -> Bool {
             !base.value.isEmpty && base.value[offset: Index<Base.Element>.Offset(0)] == element
         }
     #else

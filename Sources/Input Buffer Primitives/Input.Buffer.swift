@@ -1,6 +1,6 @@
 extension Input {
 
-    public struct Buffer<Storage: RandomAccessCollection>
+    public struct Buffer<Storage: RandomAccessCollection>: ~Copyable
     where Storage.Index: Hashable {
 
         @usableFromInline

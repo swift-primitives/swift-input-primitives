@@ -111,8 +111,10 @@ let package = Package(
             name: "Input Protocol Primitives",
             dependencies: [
                 "Input Namespace Primitives",
+                "Input Restore Primitives",
                 "Input Stream Primitives",
                 .product(name: "Index Primitives", package: "swift-index-primitives"),
+                .product(name: "Property Primitives", package: "swift-property-primitives"),
             ]
         ),
 
@@ -141,7 +143,6 @@ let package = Package(
             name: "Input Restore Primitives",
             dependencies: [
                 "Input Namespace Primitives",
-                "Input Protocol Primitives",
                 .product(name: "Property Primitives", package: "swift-property-primitives"),
             ]
         ),

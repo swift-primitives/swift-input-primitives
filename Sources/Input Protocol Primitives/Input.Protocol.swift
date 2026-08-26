@@ -1,16 +1,11 @@
 extension Input {
 
-    public protocol `Protocol`<Element>: Streaming, ~Copyable {
-
-        associatedtype Checkpoint: Comparable
+    public protocol `Protocol`<Element>: Restorable, Streaming, ~Copyable
+    where Checkpoint: Comparable {
 
         var count: Index<Element>.Count { get }
 
-        var checkpoint: Checkpoint { get }
-
         var bounds: ClosedRange<Checkpoint> { get }
-
-        mutating func seek(to checkpoint: Checkpoint)
 
         mutating func advance(by count: Index<Element>.Count)
     }

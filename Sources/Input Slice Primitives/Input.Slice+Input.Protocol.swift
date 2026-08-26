@@ -7,6 +7,12 @@ where
     Base.Index == Index_Primitives.Index<Base.Element>
 {}
 
+extension Input.Slice: Input.Restorable
+where
+    Base: Collection.`Protocol`, Base.Element: Copyable,
+    Base.Index == Index_Primitives.Index<Base.Element>
+{}
+
 extension Input.Slice: Input.`Protocol`
 where
     Base: Collection.`Protocol`, Base.Element: Copyable,

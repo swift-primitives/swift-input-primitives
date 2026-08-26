@@ -1,6 +1,6 @@
 extension Input {
 
-    public protocol Restorable: ~Copyable {
+    public protocol Restorable: ~Copyable, ~Escapable {
 
         associatedtype Checkpoint
 

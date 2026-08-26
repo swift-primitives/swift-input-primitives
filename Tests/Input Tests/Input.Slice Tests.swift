@@ -1,10 +1,10 @@
-import Input_Primitives_Test_Support
+import Input_Test_Support
 import Iterable
-import Iterator_Chunk_Primitives
-import Sequence_Primitives
+import Iterator_Chunk
+import Sequence
 import Testing
 
-@testable import Input_Primitives
+@testable import Input
 
 private struct TestCollection<Element: Sendable>: Sendable {
     var storage: [Element]
@@ -50,17 +50,17 @@ extension TestCollection.Iterator: Iterator.Chunk.`Protocol` {
 }
 
 extension TestCollection: Collection.`Protocol` {
-    var startIndex: Index_Primitives.Index<Element> { .zero }
+    var startIndex: Index.Index<Element> { .zero }
 
-    var endIndex: Index_Primitives.Index<Element> {
-        Index_Primitives.Index<Element>.Count(Cardinal(UInt(storage.count))).map(Ordinal.init)
+    var endIndex: Index.Index<Element> {
+        Index.Index<Element>.Count(Cardinal(UInt(storage.count))).map(Ordinal.init)
     }
 
-    subscript(position: Index_Primitives.Index<Element>) -> Element {
+    subscript(position: Index.Index<Element>) -> Element {
         storage[Int(bitPattern: position)]
     }
 
-    func index(after i: Index_Primitives.Index<Element>) -> Index_Primitives.Index<Element> {
+    func index(after i: Index.Index<Element>) -> Index.Index<Element> {
         do throws(Ordinal.Error) {
             return try i.successor.exact()
         } catch {

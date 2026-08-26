@@ -1,11 +1,11 @@
-public import Collection_Primitives
-internal import Equation_Primitives
-public import Index_Primitives
+public import Collection
+internal import Equation
+public import Index
 
 extension Input.Slice: Equation.`Protocol`
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Equation.`Protocol` & Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     @inlinable

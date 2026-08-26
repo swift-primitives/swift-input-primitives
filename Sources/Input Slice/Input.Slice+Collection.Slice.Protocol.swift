@@ -1,13 +1,13 @@
-public import Collection_Primitives
-public import Index_Primitives
+public import Collection
+public import Index
 public import Iterable
-public import Iterator_Chunk_Primitives
+public import Iterator_Chunk
 public import Iterator_Primitive
 
 extension Input.Slice
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     public struct Iterator: Iterator_Primitive.Iterator.`Protocol` {
@@ -27,7 +27,7 @@ where
 extension Input.Slice.Iterator
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     public typealias Element = Base.Element
@@ -44,7 +44,7 @@ where
 extension Input.Slice: Iterable
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     @_implements(Iterable,Iterator)
@@ -68,25 +68,25 @@ where
 extension Input.Slice: Collection.`Protocol`
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     @inlinable
-    public var startIndex: Index_Primitives.Index<Element> { position }
+    public var startIndex: Index.Index<Element> { position }
 
     @inlinable
-    public var endIndex: Index_Primitives.Index<Element> { _total.map(Ordinal.init) }
+    public var endIndex: Index.Index<Element> { _total.map(Ordinal.init) }
 
     @inlinable
-    public subscript(position: Index_Primitives.Index<Element>) -> Element {
-        base[_lower + Index_Primitives.Index<Element>.Count(position)]
+    public subscript(position: Index.Index<Element>) -> Element {
+        base[_lower + Index.Index<Element>.Count(position)]
     }
 
     @inlinable
-    public func index(after i: Index_Primitives.Index<Element>) -> Index_Primitives.Index<Element> {
+    public func index(after i: Index.Index<Element>) -> Index.Index<Element> {
 
         do throws(Ordinal.Error) {
-            return try i + Index_Primitives.Index<Element>.Offset(1)
+            return try i + Index.Index<Element>.Offset(1)
         } catch {
             return i
         }
@@ -96,13 +96,13 @@ where
 extension Input.Slice.Iterator: IteratorProtocol
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {}
 
 extension Input.Slice: Swift.Sequence
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     public var underestimatedCount: Int { Int(bitPattern: count) }
@@ -111,13 +111,13 @@ where
 extension Input.Slice: Swift.Collection
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     public typealias SubSequence = Self
 
     @inlinable
-    public func formIndex(after i: inout Index_Primitives.Index<Element>) {
+    public func formIndex(after i: inout Index.Index<Element>) {
         i = index(after: i)
     }
 }
@@ -125,13 +125,13 @@ where
 extension Input.Slice: Collection.Slice.`Protocol`
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     @inlinable
-    public subscript(bounds: Range<Index_Primitives.Index<Element>>) -> Self {
-        let absStart = _lower + Index_Primitives.Index<Element>.Count(bounds.lowerBound)
-        let absEnd = _lower + Index_Primitives.Index<Element>.Count(bounds.upperBound)
+    public subscript(bounds: Range<Index.Index<Element>>) -> Self {
+        let absStart = _lower + Index.Index<Element>.Count(bounds.lowerBound)
+        let absEnd = _lower + Index.Index<Element>.Count(bounds.upperBound)
         return Input.Slice(_unchecked: (), base: base, startIndex: absStart, endIndex: absEnd)
     }
 }

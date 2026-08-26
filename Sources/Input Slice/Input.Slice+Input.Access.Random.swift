@@ -1,15 +1,15 @@
-public import Collection_Primitives
-public import Index_Primitives
+public import Collection
+public import Index
 
 extension Input.Slice: Input.Access.Random
 where
     Base: Collection.`Protocol`, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     @inlinable
     public subscript(
-        offset offset: Index_Primitives.Index<Element>.Offset
+        offset offset: Index.Index<Element>.Offset
     ) -> Element {
 
         do throws(Ordinal.Error) {

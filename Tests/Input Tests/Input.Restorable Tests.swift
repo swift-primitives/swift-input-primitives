@@ -1,6 +1,6 @@
 import Testing
 
-@testable import Input_Primitives
+@testable import Input
 
 extension Input {
     @Suite

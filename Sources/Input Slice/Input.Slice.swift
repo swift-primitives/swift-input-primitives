@@ -1,5 +1,5 @@
-public import Collection_Primitives
-public import Index_Primitives
+public import Collection
+public import Index
 
 extension Input {
 
@@ -32,7 +32,7 @@ extension Input.Slice: Copyable where Base: Copyable {}
 extension Input.Slice: Sendable where Base: Sendable {}
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
 
     @usableFromInline
     var _lower: Base.Index {
@@ -45,9 +45,9 @@ where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Ele
     }
 
     @usableFromInline
-    var position: Index_Primitives.Index<Base.Element> {
+    var position: Index.Index<Base.Element> {
         @inline(always) get {
-            Index_Primitives.Index<Base.Element>(
+            Index.Index<Base.Element>(
                 _unchecked: Ordinal(UInt(bitPattern: _position))
             )
         }
@@ -58,12 +58,12 @@ where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Ele
 
     @usableFromInline
     var _index: Base.Index {
-        _lower + Index_Primitives.Index<Base.Element>.Count(position)
+        _lower + Index.Index<Base.Element>.Count(position)
     }
 }
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
 
     @inlinable
     public init(_ base: Base) {

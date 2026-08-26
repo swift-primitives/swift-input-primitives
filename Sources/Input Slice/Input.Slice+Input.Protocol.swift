@@ -1,30 +1,30 @@
-public import Collection_Primitives
-public import Index_Primitives
+public import Collection
+public import Index
 
 extension Input.Slice: Input.Streaming
 where
     Base: Collection.`Protocol`, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {}
 
 extension Input.Slice: Input.Restorable
 where
     Base: Collection.`Protocol`, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {}
 
 extension Input.Slice: Input.`Protocol`
 where
     Base: Collection.`Protocol`, Base.Element: Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     public typealias Element = Base.Element
 
-    public typealias Checkpoint = Index_Primitives.Index<Element>
+    public typealias Checkpoint = Index.Index<Element>
 
     @usableFromInline
-    var _total: Index_Primitives.Index<Element>.Count {
+    var _total: Index.Index<Element>.Count {
 
         do throws(Ordinal.Error) {
             return try _lower.distance.forward(to: _upper)
@@ -39,13 +39,13 @@ where
     }
 
     @inlinable
-    public var count: Index_Primitives.Index<Element>.Count {
-        _total.subtract.saturating(Index_Primitives.Index<Element>.Count(position))
+    public var count: Index.Index<Element>.Count {
+        _total.subtract.saturating(Index.Index<Element>.Count(position))
     }
 
     @inlinable
-    public var consumed: Index_Primitives.Index<Element>.Count {
-        Index_Primitives.Index<Element>.Count(position)
+    public var consumed: Index.Index<Element>.Count {
+        Index.Index<Element>.Count(position)
     }
 
     @inlinable
@@ -81,7 +81,7 @@ where
     }
 
     @inlinable
-    public mutating func advance(by count: Index_Primitives.Index<Element>.Count) {
+    public mutating func advance(by count: Index.Index<Element>.Count) {
         position += count
     }
 

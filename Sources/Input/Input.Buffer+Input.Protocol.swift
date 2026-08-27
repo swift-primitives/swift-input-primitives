@@ -1,24 +1,17 @@
-public import Index
-
 extension Input.Buffer: Input.`Protocol` {
 
-    public typealias Checkpoint = Index<Element>
+    public typealias Checkpoint = Int
 
     public typealias Element = Storage.Element
 
     @usableFromInline
-    var _total: Index<Element>.Count {
-
-        do throws(Cardinal.Error) {
-            return try Index<Element>.Count(storage.count)
-        } catch {
-            return .zero
-        }
+    var _total: Int {
+        storage.count
     }
 
     @inlinable
-    public var count: Index<Element>.Count {
-        _total.subtract.saturating(Index<Element>.Count(position))
+    public var count: Int {
+        _total - position
     }
 
     @inlinable
@@ -27,8 +20,8 @@ extension Input.Buffer: Input.`Protocol` {
     }
 
     @inlinable
-    public var consumed: Index<Element>.Count {
-        Index<Element>.Count(position)
+    public var consumed: Int {
+        position
     }
 
     @inlinable
@@ -47,7 +40,7 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     public var bounds: ClosedRange<Checkpoint> {
-        .zero..._total.map(Ordinal.init)
+        0..._total
     }
 
     @inlinable
@@ -57,12 +50,13 @@ extension Input.Buffer: Input.`Protocol` {
             throw .empty
         }
         let element = storage[_index]
-        position += .one
+        position += 1
         return element
     }
 
     @inlinable
-    public mutating func advance(by count: Index<Element>.Count) {
+    public mutating func advance(by count: Int) {
+        precondition(count >= 0 && count <= self.count)
         position += count
     }
 

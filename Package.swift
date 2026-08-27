@@ -25,23 +25,11 @@ let package = Package(
             targets: ["Input Apple Foundation Integration"]
         ),
     ],
-    dependencies: [
-        .package(
-            url: "https://github.com/swift-atoms/swift-index.git",
-            branch: "main"
-        ),
-        .package(
-            url: "https://github.com/swift-atoms/swift-property.git",
-            branch: "main"
-        ),
-    ],
+    dependencies: [],
     targets: [
         .target(
             name: "Input",
-            dependencies: [
-                .product(name: "Index", package: "swift-index"),
-                .product(name: "Property", package: "swift-property"),
-            ]
+            dependencies: []
         ),
         .target(
             name: "Input Standard Library Integration",
@@ -56,9 +44,13 @@ let package = Package(
         ),
         .testTarget(
             name: "Input Tests",
+            dependencies: ["Input"]
+        ),
+        .testTarget(
+            name: "Input Standard Library Integration Tests",
             dependencies: [
                 "Input",
-                .product(name: "Index", package: "swift-index"),
+                "Input Standard Library Integration",
             ]
         ),
     ],

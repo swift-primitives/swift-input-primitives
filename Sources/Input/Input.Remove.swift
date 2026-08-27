@@ -1,6 +1,3 @@
-public import Index
-public import Property
-
 extension Input {
 
     public enum Remove {}
@@ -9,20 +6,10 @@ extension Input {
 extension Input.Streaming where Self: ~Copyable {
 
     @inlinable
-    public var remove: Property<Input.Remove, Self>.Inout {
-        mutating _read {
-            yield Property.Inout(&self)
-        }
-    }
-}
-
-extension Property.Inout where Tag == Input.Remove, Base: Input.Streaming & ~Copyable {
-
-    @inlinable
     @discardableResult
-    public func first() throws(Input.Remove.Error<Base.Element>) -> Base.Element {
+    public mutating func removeFirst() throws(Input.Remove.Error<Element>) -> Element {
         do throws(Input.Stream.Error) {
-            return try base.value.advance()
+            return try advance()
         } catch {
             throw .empty
         }
@@ -30,29 +17,31 @@ extension Property.Inout where Tag == Input.Remove, Base: Input.Streaming & ~Cop
 
     @inlinable
     @discardableResult
-    public func first(__unchecked: Void) -> Base.Element {
+    public mutating func removeFirst(__unchecked: Void) -> Element {
 
         do throws(Input.Stream.Error) {
-            return try base.value.advance()
+            return try advance()
         } catch {
-            fatalError("first(__unchecked:) called on empty input — precondition violated")
+            fatalError("removeFirst(__unchecked:) called on empty input — precondition violated")
         }
     }
 }
 
-extension Property.Inout where Tag == Input.Remove, Base: Input.`Protocol` & ~Copyable {
+extension Input.`Protocol` where Self: ~Copyable {
 
     @inlinable
-    public func first(_ count: Index<Base.Element>.Count) throws(Input.Remove.Error<Base.Element>) {
-        let available = base.value.count
-        guard count <= available else {
+    public mutating func removeFirst(
+        _ count: Int
+    ) throws(Input.Remove.Error<Element>) {
+        let available = self.count
+        guard count >= 0 && count <= available else {
             throw .insufficientElements(requested: count, available: available)
         }
-        base.value.advance(by: count)
+        advance(by: count)
     }
 
     @inlinable
-    public func first(__unchecked: Void, _ count: Index<Base.Element>.Count) {
-        base.value.advance(by: count)
+    public mutating func removeFirst(__unchecked: Void, _ count: Int) {
+        advance(by: count)
     }
 }

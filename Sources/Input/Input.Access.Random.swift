@@ -1,55 +1,35 @@
-public import Index
-public import Property
-
 extension Input.Access {
 
     public protocol Random<Element>: Input.`Protocol`, ~Copyable {
 
-        subscript(offset offset: Index<Element>.Offset) -> Element { get }
+        subscript(offset offset: Int) -> Element { get }
     }
 }
 
-extension Input.Access.Random where Self: ~Copyable {
-
-    @inlinable
-    public var access: Property<Input.Access, Self>.Inout {
-        mutating _read {
-            yield Property.Inout(&self)
-        }
-    }
-}
-
-extension Property.Inout
-where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Copyable {
+extension Input.Access.Random where Self: ~Copyable, Element: Copyable {
 
     @inlinable
     public func element(
-        at offset: Index<Base.Element>.Offset
-    ) throws(Input.Access.Error<Base.Element>) -> Base.Element {
-        let count = base.value.count
+        at offset: Int
+    ) throws(Input.Access.Error<Element>) -> Element {
+        let count = self.count
         guard offset >= .zero && offset < count else {
             throw .outOfBounds(offset: offset, count: count)
         }
-        return base.value[offset: offset]
+        return self[offset: offset]
     }
 }
 
-extension Property.Inout
-where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: Equatable {
+extension Input.Access.Random where Self: ~Copyable, Element: Equatable {
 
     @inlinable
     public func starts<Prefix: Swift.Collection>(with prefix: Prefix) -> Bool
-    where Prefix.Element == Base.Element {
+    where Prefix.Element == Element {
 
-        let prefixCount: Index<Base.Element>.Count
-        do throws(Cardinal.Error) {
-            prefixCount = try Index<Base.Element>.Count(prefix.count)
-        } catch {
-            prefixCount = .zero
-        }
-        guard prefixCount <= base.value.count else { return false }
+        let prefixCount = prefix.count
+        guard prefixCount <= count else { return false }
         for (offset, element) in prefix.enumerated() {
-            if base.value[offset: Index<Base.Element>.Offset(offset)] != element { return false }
+            if self[offset: offset] != element { return false }
         }
         return true
     }
@@ -57,14 +37,14 @@ where Tag == Input.Access, Base: Input.Access.Random & ~Copyable, Base.Element: 
     #if compiler(>=6.4)
 
         @inlinable
-        public func starts(with element: consuming Base.Element) -> Bool {
-            !base.value.isEmpty && base.value[offset: Index<Base.Element>.Offset(0)] == element
+        public func starts(with element: consuming Element) -> Bool {
+            !isEmpty && self[offset: 0] == element
         }
     #else
 
         @inlinable
-        public func starts(with element: Base.Element) -> Bool {
-            !base.value.isEmpty && base.value[offset: Index<Base.Element>.Offset(0)] == element
+        public func starts(with element: Element) -> Bool {
+            !isEmpty && self[offset: 0] == element
         }
     #endif
 }

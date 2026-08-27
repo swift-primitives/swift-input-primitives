@@ -1,3 +1,6 @@
+public import Index
+public import Property
+
 extension Input.Access {
 
     public protocol Random<Element>: Input.`Protocol`, ~Copyable {

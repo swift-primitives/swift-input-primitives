@@ -1,3 +1,5 @@
+public import Property
+
 extension Property.Inout where Tag == Input.Restore, Base: Input.`Protocol` & ~Copyable {
 
     @inlinable

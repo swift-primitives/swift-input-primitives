@@ -1,3 +1,5 @@
+public import Index
+
 extension Input.Remove {
 
     public enum Error<Element: ~Copyable>: Swift.Error, Sendable, Equatable {

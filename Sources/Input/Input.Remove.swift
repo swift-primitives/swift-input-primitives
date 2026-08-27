@@ -1,3 +1,6 @@
+public import Index
+public import Property
+
 extension Input {
 
     public enum Remove {}

@@ -1,3 +1,5 @@
+public import Index
+
 extension Input.Buffer: Input.`Protocol` {
 
     public typealias Checkpoint = Index<Element>

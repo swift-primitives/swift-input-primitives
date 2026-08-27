@@ -1,5 +1,4 @@
-import Byte
-import Input_Test_Support
+import Index
 import Testing
 
 @testable import Input
@@ -289,8 +288,8 @@ extension Input.`Buffer Test`.`Edge Case` {
 
 extension Input.`Buffer Test`.Integration {
     @Test
-    func `byte parsing scenario`() throws(Input.Remove.Error<Byte>) {
-        let bytes: [Byte] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]
+    func `byte parsing scenario`() throws(Input.Remove.Error<UInt8>) {
+        let bytes: [UInt8] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]
         var input = Input.Buffer(bytes)
 
         let cp = input.checkpoint

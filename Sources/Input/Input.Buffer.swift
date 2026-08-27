@@ -1,3 +1,5 @@
+public import Index
+
 extension Input {
 
     public struct Buffer<Storage: RandomAccessCollection>: ~Copyable

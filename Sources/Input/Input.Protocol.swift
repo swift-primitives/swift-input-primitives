@@ -1,3 +1,5 @@
+public import Index
+
 extension Input {
 
     public protocol `Protocol`<Element>: Restorable, Streaming, ~Copyable

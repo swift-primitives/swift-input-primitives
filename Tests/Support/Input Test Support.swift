@@ -1,5 +1,14 @@
+public import Cardinal
+public import Cardinal_Tagged
 public import Index
 public import Input
+public import Ordinal
+public import Ordinal_Protocol
+public import Ordinal_Successor
+public import Ordinal_Tagged
+public import Tagged
+
+internal import Cardinal_Error
 
 extension Input {
 
@@ -14,7 +23,7 @@ extension Input.Fixture {
         var _elements: [Element]
 
         @usableFromInline
-        var _position: Index.Index<Element>
+        var _position: Index::Index<Element>
 
         @inlinable
         public init(_ elements: [Element]) {
@@ -28,7 +37,7 @@ extension Input.Fixture.Source: Input.Streaming {
 
     @inlinable
     public var isEmpty: Bool {
-        Int(bitPattern: _position) >= _elements.count
+        Int(bitPattern: _position.underlying.rawValue) >= _elements.count
     }
 
     @inlinable
@@ -37,7 +46,7 @@ extension Input.Fixture.Source: Input.Streaming {
         guard !isEmpty else {
             throw .empty
         }
-        let element = _elements[Int(bitPattern: _position)]
+        let element = _elements[Int(bitPattern: _position.underlying.rawValue)]
         _position = _position.successor.saturating()
         return element
     }
@@ -45,12 +54,12 @@ extension Input.Fixture.Source: Input.Streaming {
 
 extension Input.Fixture.Source: Input.`Protocol` {
 
-    public typealias Checkpoint = Index.Index<Element>
+    public typealias Checkpoint = Index::Index<Element>
 
     @usableFromInline
-    var _total: Index.Index<Element>.Count {
+    var _total: Index::Index<Element>.Count {
         do throws(Cardinal.Error) {
-            return try Index.Index<Element>.Count(_elements.count)
+            return try Index::Index<Element>.Count(_elements.count)
         } catch {
 
             return .zero
@@ -58,8 +67,8 @@ extension Input.Fixture.Source: Input.`Protocol` {
     }
 
     @inlinable
-    public var count: Index.Index<Element>.Count {
-        _total.subtract.saturating(Index.Index<Element>.Count(_position))
+    public var count: Index::Index<Element>.Count {
+        _total.subtract.saturating(Index::Index<Element>.Count(_position))
     }
 
     @inlinable
@@ -67,7 +76,9 @@ extension Input.Fixture.Source: Input.`Protocol` {
 
     @inlinable
     public var bounds: ClosedRange<Checkpoint> {
-        .zero..._total.map(Ordinal.init)
+        .zero...Index::Index<Element>(
+            _unchecked: Ordinal(_total.underlying.rawValue)
+        )
     }
 
     @inlinable
@@ -76,7 +87,7 @@ extension Input.Fixture.Source: Input.`Protocol` {
     }
 
     @inlinable
-    public mutating func advance(by count: Index.Index<Element>.Count) {
+    public mutating func advance(by count: Index::Index<Element>.Count) {
         _position += count
     }
 }

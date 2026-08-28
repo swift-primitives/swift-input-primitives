@@ -1,4 +1,7 @@
-extension Property.Inout where Tag == Input.Restore, Base: Input.`Protocol` & ~Copyable {
+public import Property_Inout
+
+extension Property::Property.Inout
+where Tag == Input.Restore, Base: Input.`Protocol` & ~Copyable {
 
     @inlinable
     public func to(_ checkpoint: Base.Checkpoint) throws(Input.Restore.Error) {

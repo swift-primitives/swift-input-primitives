@@ -1,3 +1,12 @@
+public import Cardinal
+public import Index
+public import Input_Namespace
+public import Ordinal_Protocol
+public import Ordinal_Tagged
+public import Tagged
+
+internal import Ordinal
+
 extension Input {
 
     public struct Buffer<Storage: RandomAccessCollection>: ~Copyable
@@ -7,7 +16,7 @@ extension Input {
         var storage: Storage
 
         @usableFromInline
-        var position: Index<Storage.Element>
+        var position: Index::Index<Storage.Element>
 
         @inlinable
         public init(_ storage: Storage) {
@@ -22,7 +31,10 @@ extension Input.Buffer {
 
     @usableFromInline
     var _index: Storage.Index {
-        storage.index(storage.startIndex, offsetBy: Int(bitPattern: position))
+        storage.index(
+            storage.startIndex,
+            offsetBy: Int(bitPattern: position.underlying.rawValue)
+        )
     }
 }
 
@@ -45,9 +57,12 @@ extension Input.Buffer {
     @inlinable
     public init<Element>(
         repeating element: Element,
-        count: Index<Element>.Count
+        count: Index::Index<Element>.Count
     ) where Storage == ContiguousArray<Element> {
-        self.storage = ContiguousArray(repeating: element, count: count)
+        self.storage = ContiguousArray(
+            repeating: element,
+            count: Int(bitPattern: count.underlying.rawValue)
+        )
         self.position = .zero
     }
 }

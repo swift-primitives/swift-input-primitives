@@ -1,5 +1,10 @@
-public import Collection
+public import Collection_Protocol
 public import Index
+public import Ordinal
+public import Tagged
+
+internal import Ordinal_Protocol
+internal import Ordinal_Tagged
 
 extension Input {
 
@@ -32,7 +37,7 @@ extension Input.Slice: Copyable where Base: Copyable {}
 extension Input.Slice: Sendable where Base: Sendable {}
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index::Index<Base.Element> {
 
     @usableFromInline
     var _lower: Base.Index {
@@ -45,32 +50,32 @@ where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
     }
 
     @usableFromInline
-    var position: Index.Index<Base.Element> {
+    var position: Index::Index<Base.Element> {
         @inline(always) get {
-            Index.Index<Base.Element>(
+            Index::Index<Base.Element>(
                 _unchecked: Ordinal(UInt(bitPattern: _position))
             )
         }
         @inline(always) set {
-            _position = Int(bitPattern: newValue)
+            _position = Int(bitPattern: newValue.underlying.rawValue)
         }
     }
 
     @usableFromInline
     var _index: Base.Index {
-        _lower + Index.Index<Base.Element>.Count(position)
+        _lower + Index::Index<Base.Element>.Count(position)
     }
 }
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index::Index<Base.Element> {
 
     @inlinable
     public init(_ base: Base) {
         self.init(
             _base: base,
-            start: Int(bitPattern: base.startIndex),
-            end: Int(bitPattern: base.endIndex),
+            start: Int(bitPattern: base.startIndex.underlying.rawValue),
+            end: Int(bitPattern: base.endIndex.underlying.rawValue),
             position: 0
         )
     }
@@ -84,8 +89,8 @@ where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
     ) {
         self.init(
             _base: base,
-            start: Int(bitPattern: startIndex),
-            end: Int(bitPattern: endIndex),
+            start: Int(bitPattern: startIndex.underlying.rawValue),
+            end: Int(bitPattern: endIndex.underlying.rawValue),
             position: 0
         )
     }

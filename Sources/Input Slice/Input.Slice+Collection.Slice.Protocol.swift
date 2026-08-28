@@ -1,16 +1,26 @@
-public import Collection
+public import Affine_Arithmetic
+public import Affine_Tagged
+public import Cardinal
+public import Collection_Slice
 public import Index
-public import Iterable
-public import Iterator_Chunk
 public import Iterator
+public import Iterator_Chunk
+public import Iterator_Protocol
+public import Ordinal
+public import Ordinal_Protocol
+public import Ordinal_Tagged
+public import Sequence_Borrowing
+public import Tagged
+
+internal import Ordinal_Error
 
 extension Input.Slice
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {
 
-    public struct Iterator: Iterator.Iterator.`Protocol` {
+    public struct Iterator: Iterator::Iterator.`Protocol` {
         @usableFromInline let base: Base
         @usableFromInline let _upper: Base.Index
         @usableFromInline var current: Base.Index
@@ -27,7 +37,7 @@ where
 extension Input.Slice.Iterator
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {
 
     public typealias Element = Base.Element
@@ -41,22 +51,22 @@ where
     }
 }
 
-extension Input.Slice: Iterable
+extension Input.Slice: Sequence.Borrowing.`Protocol`
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {
 
-    @_implements(Iterable,Iterator)
-    public typealias IterableIterator = Iterator.Iterator.Materializing<Iterator>
+    @_implements(Sequence.Borrowing.`Protocol`, Iterator)
+    public typealias BorrowingIterator = Iterator::Iterator.Materializing<Iterator>
 
     @inlinable
     @_lifetime(borrow self)
-    @_implements(Iterable,makeIterator())
-    public borrowing func iterableMakeIterator()
-        -> Iterator.Iterator.Materializing<Iterator>
+    @_implements(Sequence.Borrowing.`Protocol`, makeIterator())
+    public borrowing func borrowingMakeIterator()
+        -> Iterator::Iterator.Materializing<Iterator>
     {
-        Iterator.Iterator.Materializing(Iterator(base: base, start: _index, end: _upper))
+        Iterator::Iterator.Materializing(Iterator(base: base, start: _index, end: _upper))
     }
 
     @inlinable
@@ -68,25 +78,27 @@ where
 extension Input.Slice: Collection.`Protocol`
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {
 
     @inlinable
-    public var startIndex: Index.Index<Element> { position }
+    public var startIndex: Index::Index<Element> { position }
 
     @inlinable
-    public var endIndex: Index.Index<Element> { _total.map(Ordinal.init) }
-
-    @inlinable
-    public subscript(position: Index.Index<Element>) -> Element {
-        base[_lower + Index.Index<Element>.Count(position)]
+    public var endIndex: Index::Index<Element> {
+        Index::Index<Element>(_unchecked: Ordinal(_total.underlying.rawValue))
     }
 
     @inlinable
-    public func index(after i: Index.Index<Element>) -> Index.Index<Element> {
+    public subscript(position: Index::Index<Element>) -> Element {
+        base[_lower + Index::Index<Element>.Count(position)]
+    }
+
+    @inlinable
+    public func index(after i: Index::Index<Element>) -> Index::Index<Element> {
 
         do throws(Ordinal.Error) {
-            return try i + Index.Index<Element>.Offset(1)
+            return try i + Index::Index<Element>.Offset(1)
         } catch {
             return i
         }
@@ -96,28 +108,28 @@ where
 extension Input.Slice.Iterator: IteratorProtocol
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {}
 
 extension Input.Slice: Swift.Sequence
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {
 
-    public var underestimatedCount: Int { Int(bitPattern: count) }
+    public var underestimatedCount: Int { Int(bitPattern: count.underlying.rawValue) }
 }
 
 extension Input.Slice: Swift.Collection
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {
 
     public typealias SubSequence = Self
 
     @inlinable
-    public func formIndex(after i: inout Index.Index<Element>) {
+    public func formIndex(after i: inout Index::Index<Element>) {
         i = index(after: i)
     }
 }
@@ -125,13 +137,13 @@ where
 extension Input.Slice: Collection.Slice.`Protocol`
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base.Index == Index::Index<Base.Element>
 {
 
     @inlinable
-    public subscript(bounds: Range<Index.Index<Element>>) -> Self {
-        let absStart = _lower + Index.Index<Element>.Count(bounds.lowerBound)
-        let absEnd = _lower + Index.Index<Element>.Count(bounds.upperBound)
+    public subscript(bounds: Range<Index::Index<Element>>) -> Self {
+        let absStart = _lower + Index::Index<Element>.Count(bounds.lowerBound)
+        let absEnd = _lower + Index::Index<Element>.Count(bounds.upperBound)
         return Input.Slice(_unchecked: (), base: base, startIndex: absStart, endIndex: absEnd)
     }
 }

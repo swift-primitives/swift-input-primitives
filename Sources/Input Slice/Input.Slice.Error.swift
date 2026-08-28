@@ -1,8 +1,10 @@
-public import Collection
+public import Collection_Protocol
 public import Index
+public import Ordinal
+public import Tagged
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index::Index<Base.Element> {
 
     public enum Error: Swift.Error, Sendable, Equatable {
 
@@ -11,7 +13,7 @@ where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
 }
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index::Index<Base.Element> {
 
     @inlinable
     public init(
@@ -27,8 +29,8 @@ where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
         }
         self.init(
             _base: base,
-            start: Int(bitPattern: startIndex),
-            end: Int(bitPattern: endIndex),
+            start: Int(bitPattern: startIndex.underlying.rawValue),
+            end: Int(bitPattern: endIndex.underlying.rawValue),
             position: 0
         )
     }

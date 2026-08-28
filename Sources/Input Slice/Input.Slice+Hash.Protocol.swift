@@ -1,11 +1,12 @@
-public import Collection
-internal import Hash
+public import Collection_Protocol
+public import Hash_Protocol
 public import Index
 
-extension Input.Slice: Hash.`Protocol`
+extension Input.Slice: Swift.Hashable
 where
-    Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base: Collection.`Protocol` & Copyable,
+    Base.Element: Hash::Hash.`Protocol` & Copyable,
+    Base.Index == Index::Index<Base.Element>
 {
 
     @inlinable
@@ -18,8 +19,9 @@ where
     }
 }
 
-extension Input.Slice: Swift.Hashable
+extension Input.Slice: Hash::Hash.`Protocol`
 where
-    Base: Collection.`Protocol` & Copyable, Base.Element: Hash.`Protocol` & Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base: Collection.`Protocol` & Copyable,
+    Base.Element: Hash::Hash.`Protocol` & Copyable,
+    Base.Index == Index::Index<Base.Element>
 {}

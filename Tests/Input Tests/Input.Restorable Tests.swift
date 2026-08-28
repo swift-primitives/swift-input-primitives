@@ -37,11 +37,20 @@ extension Input.`Restorable Test`.Unit {
     }
 
     @Test
-    func `seek restores through the protocol primitive`() {
+    func `restore sugar seeks through the unchecked overload`() {
         var record = Record(count: 1, name: "a")
         let checkpoint = record.checkpoint
         record.count = 9
-        record.seek(to: checkpoint)
+        record.restore.to(__unchecked: (), checkpoint)
         #expect(record == Record(count: 1, name: "a"))
+    }
+
+    @Test
+    func `optional input backtracks to its checkpoint`() {
+        var response: Int? = nil
+        let checkpoint = response.checkpoint
+        response = 42
+        response.seek(to: checkpoint)
+        #expect(response == nil)
     }
 }

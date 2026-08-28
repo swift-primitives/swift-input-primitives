@@ -1,3 +1,4 @@
+public import Index
 public import Input
 
 extension Input {
@@ -13,12 +14,12 @@ extension Input.Fixture {
         var _elements: [Element]
 
         @usableFromInline
-        var _position: Int
+        var _position: Index.Index<Element>
 
         @inlinable
         public init(_ elements: [Element]) {
             self._elements = elements
-            self._position = 0
+            self._position = .zero
         }
     }
 }
@@ -27,7 +28,7 @@ extension Input.Fixture.Source: Input.Streaming {
 
     @inlinable
     public var isEmpty: Bool {
-        _position >= _elements.count
+        Int(bitPattern: _position) >= _elements.count
     }
 
     @inlinable
@@ -36,24 +37,29 @@ extension Input.Fixture.Source: Input.Streaming {
         guard !isEmpty else {
             throw .empty
         }
-        let element = _elements[_position]
-        _position += 1
+        let element = _elements[Int(bitPattern: _position)]
+        _position = _position.successor.saturating()
         return element
     }
 }
 
 extension Input.Fixture.Source: Input.`Protocol` {
 
-    public typealias Checkpoint = Int
+    public typealias Checkpoint = Index.Index<Element>
 
     @usableFromInline
-    var _total: Int {
-        _elements.count
+    var _total: Index.Index<Element>.Count {
+        do throws(Cardinal.Error) {
+            return try Index.Index<Element>.Count(_elements.count)
+        } catch {
+
+            return .zero
+        }
     }
 
     @inlinable
-    public var count: Int {
-        _total - _position
+    public var count: Index.Index<Element>.Count {
+        _total.subtract.saturating(Index.Index<Element>.Count(_position))
     }
 
     @inlinable
@@ -61,7 +67,7 @@ extension Input.Fixture.Source: Input.`Protocol` {
 
     @inlinable
     public var bounds: ClosedRange<Checkpoint> {
-        0..._total
+        .zero..._total.map(Ordinal.init)
     }
 
     @inlinable
@@ -70,7 +76,7 @@ extension Input.Fixture.Source: Input.`Protocol` {
     }
 
     @inlinable
-    public mutating func advance(by count: Int) {
+    public mutating func advance(by count: Index.Index<Element>.Count) {
         _position += count
     }
 }

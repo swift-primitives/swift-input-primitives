@@ -4,6 +4,6 @@ extension Input.Remove {
 
         case empty
 
-        case insufficientElements(requested: Int, available: Int)
+        case insufficientElements(requested: Index<Element>.Count, available: Index<Element>.Count)
     }
 }

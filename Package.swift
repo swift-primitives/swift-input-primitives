@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swift-input-primitives",
+    name: "swift-input",
     platforms: [
         .macOS(.v27),
         .iOS(.v27),
@@ -14,196 +14,196 @@ let package = Package(
     products: [
 
         .library(
-            name: "Input Access Primitives",
-            targets: ["Input Access Primitives"]
+            name: "Input Access",
+            targets: ["Input Access"]
         ),
         .library(
-            name: "Input Buffer Primitives",
-            targets: ["Input Buffer Primitives"]
+            name: "Input Buffer",
+            targets: ["Input Buffer"]
         ),
         .library(
-            name: "Input Namespace Primitives",
-            targets: ["Input Namespace Primitives"]
+            name: "Input Namespace",
+            targets: ["Input Namespace"]
         ),
         .library(
-            name: "Input Protocol Primitives",
-            targets: ["Input Protocol Primitives"]
+            name: "Input Protocol",
+            targets: ["Input Protocol"]
         ),
         .library(
-            name: "Input Remove Primitives",
-            targets: ["Input Remove Primitives"]
+            name: "Input Remove",
+            targets: ["Input Remove"]
         ),
         .library(
-            name: "Input Restore Primitives",
-            targets: ["Input Restore Primitives"]
+            name: "Input Restore",
+            targets: ["Input Restore"]
         ),
         .library(
-            name: "Input Slice Primitives",
-            targets: ["Input Slice Primitives"]
+            name: "Input Slice",
+            targets: ["Input Slice"]
         ),
         .library(
-            name: "Input Stream Primitives",
-            targets: ["Input Stream Primitives"]
-        ),
-
-        .library(
-            name: "Input Primitives",
-            targets: ["Input Primitives"]
+            name: "Input Stream",
+            targets: ["Input Stream"]
         ),
 
         .library(
-            name: "Input Primitives Test Support",
-            targets: ["Input Primitives Test Support"]
+            name: "Input",
+            targets: ["Input"]
+        ),
+
+        .library(
+            name: "Input Test Support",
+            targets: ["Input Test Support"]
         ),
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-collection-primitives.git",
+            url: "https://github.com/swift-atoms/swift-collection.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-equation-primitives.git",
+            url: "https://github.com/swift-atoms/swift-equation.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-comparison-primitives.git",
+            url: "https://github.com/swift-atoms/swift-comparison.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-hash-primitives.git",
+            url: "https://github.com/swift-atoms/swift-hash.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-property-primitives.git",
+            url: "https://github.com/swift-atoms/swift-property.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-index-primitives.git",
+            url: "https://github.com/swift-atoms/swift-index.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-byte-primitives.git",
+            url: "https://github.com/swift-atoms/swift-byte.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-iterator-primitives.git",
+            url: "https://github.com/swift-atoms/swift-iterator.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-primitives/swift-sequence-primitives.git",
+            url: "https://github.com/swift-atoms/swift-sequence.git",
             branch: "main"
         ),
     ],
     targets: [
 
         .target(
-            name: "Input Namespace Primitives"
+            name: "Input Namespace"
         ),
 
         .target(
-            name: "Input Stream Primitives",
+            name: "Input Stream",
             dependencies: [
-                "Input Namespace Primitives"
+                .target(name: "Input Namespace")
             ]
         ),
 
         .target(
-            name: "Input Protocol Primitives",
+            name: "Input Protocol",
             dependencies: [
-                "Input Namespace Primitives",
-                "Input Restore Primitives",
-                "Input Stream Primitives",
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Property Primitives", package: "swift-property-primitives"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Restore"),
+                .target(name: "Input Stream"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Property", package: "swift-property"),
             ]
         ),
 
         .target(
-            name: "Input Access Primitives",
+            name: "Input Access",
             dependencies: [
-                "Input Namespace Primitives",
-                "Input Protocol Primitives",
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Property Primitives", package: "swift-property-primitives"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Property", package: "swift-property"),
             ]
         ),
 
         .target(
-            name: "Input Remove Primitives",
+            name: "Input Remove",
             dependencies: [
-                "Input Namespace Primitives",
-                "Input Protocol Primitives",
-                "Input Stream Primitives",
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Property Primitives", package: "swift-property-primitives"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .target(name: "Input Stream"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Property", package: "swift-property"),
             ]
         ),
 
         .target(
-            name: "Input Restore Primitives",
+            name: "Input Restore",
             dependencies: [
-                "Input Namespace Primitives",
-                .product(name: "Property Primitives", package: "swift-property-primitives"),
+                .target(name: "Input Namespace"),
+                .product(name: "Property", package: "swift-property"),
             ]
         ),
 
         .target(
-            name: "Input Buffer Primitives",
+            name: "Input Buffer",
             dependencies: [
-                "Input Access Primitives",
-                "Input Namespace Primitives",
-                "Input Protocol Primitives",
-                "Input Stream Primitives",
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
+                .target(name: "Input Access"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .target(name: "Input Stream"),
+                .product(name: "Index", package: "swift-index"),
             ]
         ),
 
         .target(
-            name: "Input Slice Primitives",
+            name: "Input Slice",
             dependencies: [
-                "Input Access Primitives",
-                "Input Namespace Primitives",
-                "Input Protocol Primitives",
-                .product(name: "Collection Primitives", package: "swift-collection-primitives"),
-                .product(name: "Comparison Primitives", package: "swift-comparison-primitives"),
-                .product(name: "Equation Primitives", package: "swift-equation-primitives"),
-                .product(name: "Hash Primitives", package: "swift-hash-primitives"),
-                .product(name: "Index Primitives", package: "swift-index-primitives"),
-                .product(name: "Iterable", package: "swift-iterator-primitives"),
-                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
+                .target(name: "Input Access"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .product(name: "Collection", package: "swift-collection"),
+                .product(name: "Comparison", package: "swift-comparison"),
+                .product(name: "Equation", package: "swift-equation"),
+                .product(name: "Hash", package: "swift-hash"),
+                .product(name: "Index", package: "swift-index"),
+                .product(name: "Iterable", package: "swift-iterator"),
+                .product(name: "Iterator Chunk", package: "swift-iterator"),
             ]
         ),
 
         .target(
-            name: "Input Primitives",
+            name: "Input",
             dependencies: [
-                "Input Access Primitives",
-                "Input Buffer Primitives",
-                "Input Namespace Primitives",
-                "Input Protocol Primitives",
-                "Input Remove Primitives",
-                "Input Restore Primitives",
-                "Input Slice Primitives",
-                "Input Stream Primitives",
+                .target(name: "Input Access"),
+                .target(name: "Input Buffer"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .target(name: "Input Remove"),
+                .target(name: "Input Restore"),
+                .target(name: "Input Slice"),
+                .target(name: "Input Stream"),
             ]
         ),
 
         .target(
-            name: "Input Primitives Test Support",
+            name: "Input Test Support",
             dependencies: [
-                "Input Primitives",
-                .product(name: "Index Primitives Test Support", package: "swift-index-primitives"),
+                .target(name: "Input"),
+                .product(name: "Index Test Support", package: "swift-index"),
             ],
             path: "Tests/Support"
         ),
         .testTarget(
-            name: "Input Primitives Tests",
+            name: "Input Tests",
             dependencies: [
-                "Input Primitives",
-                "Input Primitives Test Support",
-                .product(name: "Iterator Chunk Primitives", package: "swift-iterator-primitives"),
-                .product(name: "Byte Primitives", package: "swift-byte-primitives"),
-                .product(name: "Sequence Primitives", package: "swift-sequence-primitives"),
+                .target(name: "Input"),
+                .target(name: "Input Test Support"),
+                .product(name: "Iterator Chunk", package: "swift-iterator"),
+                .product(name: "Byte", package: "swift-byte"),
+                .product(name: "Sequence", package: "swift-sequence"),
             ]
         ),
     ],

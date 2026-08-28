@@ -1,11 +1,11 @@
-public import Collection_Primitives
-internal import Comparison_Primitives
-public import Index_Primitives
+public import Collection
+internal import Comparison
+public import Index
 
 extension Input.Slice: Comparison.`Protocol`
 where
     Base: Collection.`Protocol` & Copyable, Base.Element: Comparison.`Protocol` & Copyable,
-    Base.Index == Index_Primitives.Index<Base.Element>
+    Base.Index == Index.Index<Base.Element>
 {
 
     @inlinable

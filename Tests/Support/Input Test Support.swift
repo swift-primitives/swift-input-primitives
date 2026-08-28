@@ -1,5 +1,5 @@
-public import Index_Primitives
-public import Input_Primitives
+public import Index
+public import Input
 
 extension Input {
 
@@ -14,7 +14,7 @@ extension Input.Fixture {
         var _elements: [Element]
 
         @usableFromInline
-        var _position: Index_Primitives.Index<Element>
+        var _position: Index.Index<Element>
 
         @inlinable
         public init(_ elements: [Element]) {
@@ -45,12 +45,12 @@ extension Input.Fixture.Source: Input.Streaming {
 
 extension Input.Fixture.Source: Input.`Protocol` {
 
-    public typealias Checkpoint = Index_Primitives.Index<Element>
+    public typealias Checkpoint = Index.Index<Element>
 
     @usableFromInline
-    var _total: Index_Primitives.Index<Element>.Count {
+    var _total: Index.Index<Element>.Count {
         do throws(Cardinal.Error) {
-            return try Index_Primitives.Index<Element>.Count(_elements.count)
+            return try Index.Index<Element>.Count(_elements.count)
         } catch {
 
             return .zero
@@ -58,8 +58,8 @@ extension Input.Fixture.Source: Input.`Protocol` {
     }
 
     @inlinable
-    public var count: Index_Primitives.Index<Element>.Count {
-        _total.subtract.saturating(Index_Primitives.Index<Element>.Count(_position))
+    public var count: Index.Index<Element>.Count {
+        _total.subtract.saturating(Index.Index<Element>.Count(_position))
     }
 
     @inlinable
@@ -76,7 +76,7 @@ extension Input.Fixture.Source: Input.`Protocol` {
     }
 
     @inlinable
-    public mutating func advance(by count: Index_Primitives.Index<Element>.Count) {
+    public mutating func advance(by count: Index.Index<Element>.Count) {
         _position += count
     }
 }

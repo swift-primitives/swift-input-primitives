@@ -1,8 +1,8 @@
-import Byte_Primitives
-import Input_Primitives_Test_Support
+import Byte
+import Input_Test_Support
 import Testing
 
-@testable import Input_Primitives
+@testable import Input
 
 extension Input {
     @Suite

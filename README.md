@@ -11,7 +11,7 @@ The cursor pattern in this package serves the same role as `Foundation.Scanner` 
 ## Quick Start
 
 ```swift
-import Input_Primitives
+import Input
 
 // `Input.Buffer` owns a byte array and exposes a checkpointable cursor.
 var input = Input.Buffer([1, 2, 3, 4, 5])
@@ -52,7 +52,7 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-primitives/swift-input-primitives.git", branch: "main"),
+    .package(url: "https://github.com/swift-atoms/swift-input.git", branch: "main"),
 ]
 ```
 
@@ -60,7 +60,7 @@ dependencies: [
 .target(
     name: "App",
     dependencies: [
-        .product(name: "Input Primitives", package: "swift-input-primitives"),
+        .product(name: "Input", package: "swift-input"),
     ]
 )
 ```
@@ -75,7 +75,7 @@ Nine variant libraries plus an umbrella product and a Test Support spine. Consum
 
 | Product | When to import | What's in it |
 |---------|---------------|--------------|
-| `Input Primitives` | Default for application code | The full protocol family + concrete cursors. Re-exports all 8 sub-targets so a single `import Input_Primitives` brings the entire surface into scope. |
+| `Input Primitives` | Default for application code | The full protocol family + concrete cursors. Re-exports all 8 sub-targets so a single `import Input` brings the entire surface into scope. |
 | `Input Namespace Primitives` | Defining the `Input` namespace shell from a sibling package | Just the `public enum Input` namespace shell. |
 | `Input Protocol Primitives` | Conforming a custom cursor type to `Input.Protocol` | `Input.Protocol` + default impls (validation, advance, etc.). |
 | `Input Stream Primitives` | Stream-only cursors that don't need checkpointing | `Input.Stream.Protocol` + `Input.Stream` namespace + `Input.Stream.Error`. |
@@ -84,7 +84,7 @@ Nine variant libraries plus an umbrella product and a Test Support spine. Consum
 | `Input Slice Primitives` | Zero-copy slice cursors over `Collection.Protocol` conformers | `Input.Slice<Base>` + protocol conformances (Input, Collection.Slice, Comparison, Equation, Hash). |
 | `Input Remove Primitives` | The fluent `.remove.first()` / `.remove.first(_:)` surface | `Input.Remove` View + `Input.Remove.Error`. |
 | `Input Restore Primitives` | The fluent `.restore.to(_:)` surface | `Input.Restore` View + `Input.Restore.Error`. |
-| `Input Primitives Test Support` | Test targets | `Input.Fixture.Source` and re-exports for downstream test consumers. |
+| `Input Test Support` | Test targets | `Input.Fixture.Source` and re-exports for downstream test consumers. |
 
 Foundation-free. No concurrency surface. No platform conditionals.
 
@@ -103,7 +103,7 @@ A cursor type conforms to whichever level its underlying storage supports: linea
 
 ### Fluent surface via Property.Inout
 
-The cursor operations — `.remove.first()`, `.remove.first(_:)`, `.restore.to(_:)` — are provided by `Property<Tag, Base>.Inout` accessors from `swift-property-primitives`. Conformers do not implement the View types; satisfying the protocol primitives is sufficient. The phantom-tagged Property machinery makes the call-site form (`input.remove.first()`) compose with `~Copyable` cursor types without forcing copies.
+The cursor operations — `.remove.first()`, `.remove.first(_:)`, `.restore.to(_:)` — are provided by `Property<Tag, Base>.Inout` accessors from `swift-property`. Conformers do not implement the View types; satisfying the protocol primitives is sufficient. The phantom-tagged Property machinery makes the call-site form (`input.remove.first()`) compose with `~Copyable` cursor types without forcing copies.
 
 `.remove.first(_:Index<Element>.Count)` removes a typed count of elements; the typed `Count` parameter rules out arithmetic mistakes that `Int` would silently allow. The fluent `.restore.to(_:)` calls into the protocol primitive `seek(to:)`, which conformers implement directly.
 
@@ -162,11 +162,11 @@ Pre-1.0. The public API of `Input.Protocol` and its members may change while the
 
 Direct dependencies (all already-public):
 
-- [swift-collection-primitives](https://github.com/swift-primitives/swift-collection-primitives) — `Collection.Protocol` family + `Collection.Slice.Protocol`, the bridges `Input.Slice` conforms to for indexed cursor access.
-- [swift-sequence-primitives](https://github.com/swift-primitives/swift-sequence-primitives) — `Sequence.Protocol` + `Sequence.Iterator.Protocol`, the iterator family the slice cursor's `CollectionIterator` conforms to.
-- [swift-index-primitives](https://github.com/swift-primitives/swift-index-primitives) — `Index<Element>`, `Index.Offset`, `Index.Count`, the typed-position surface every cursor stores positions in.
-- [swift-property-primitives](https://github.com/swift-primitives/swift-property-primitives) — `Property<Tag, Base>.Inout`, the phantom-tagged fluent-accessor machinery that powers `.remove.first()`, `.restore.to(_:)`, and friends.
-- [swift-comparison-primitives](https://github.com/swift-primitives/swift-comparison-primitives), [swift-equation-primitives](https://github.com/swift-primitives/swift-equation-primitives), [swift-hash-primitives](https://github.com/swift-primitives/swift-hash-primitives) — base protocols `Input.Slice` conforms to for comparator/equator/hasher integration in parser combinators.
+- [swift-collection](https://github.com/swift-atoms/swift-collection) — `Collection.Protocol` family + `Collection.Slice.Protocol`, the bridges `Input.Slice` conforms to for indexed cursor access.
+- [swift-sequence](https://github.com/swift-atoms/swift-sequence) — `Sequence.Protocol` + `Sequence.Iterator.Protocol`, the iterator family the slice cursor's `CollectionIterator` conforms to.
+- [swift-index](https://github.com/swift-atoms/swift-index) — `Index<Element>`, `Index.Offset`, `Index.Count`, the typed-position surface every cursor stores positions in.
+- [swift-property](https://github.com/swift-atoms/swift-property) — `Property<Tag, Base>.Inout`, the phantom-tagged fluent-accessor machinery that powers `.remove.first()`, `.restore.to(_:)`, and friends.
+- [swift-comparison](https://github.com/swift-atoms/swift-comparison), [swift-equation](https://github.com/swift-atoms/swift-equation), [swift-hash](https://github.com/swift-atoms/swift-hash) — base protocols `Input.Slice` conforms to for comparator/equator/hasher integration in parser combinators.
 
 ---
 

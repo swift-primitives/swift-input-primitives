@@ -1,8 +1,8 @@
-public import Collection_Primitives
-public import Index_Primitives
+public import Collection
+public import Index
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
 
     public enum Error: Swift.Error, Sendable, Equatable {
 
@@ -11,7 +11,7 @@ where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Ele
 }
 
 extension Input.Slice
-where Base: Collection.`Protocol`, Base.Index == Index_Primitives.Index<Base.Element> {
+where Base: Collection.`Protocol`, Base.Index == Index.Index<Base.Element> {
 
     @inlinable
     public init(

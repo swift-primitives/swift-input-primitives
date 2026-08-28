@@ -1,11 +1,14 @@
-public import Collection
-internal import Comparison
+public import Cardinal
+public import Collection_Protocol
+public import Comparison_Protocol
 public import Index
+public import Tagged
 
-extension Input.Slice: Comparison.`Protocol`
+extension Input.Slice: Comparison::Comparison.`Protocol`
 where
-    Base: Collection.`Protocol` & Copyable, Base.Element: Comparison.`Protocol` & Copyable,
-    Base.Index == Index.Index<Base.Element>
+    Base: Collection.`Protocol` & Copyable,
+    Base.Element: Comparison::Comparison.`Protocol` & Copyable,
+    Base.Index == Index::Index<Base.Element>
 {
 
     @inlinable

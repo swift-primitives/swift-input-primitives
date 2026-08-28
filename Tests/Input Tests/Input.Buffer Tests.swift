@@ -1,5 +1,9 @@
+import Affine_Tagged
 import Byte
+import Index
 import Input_Test_Support
+import Ordinal_Protocol
+import Tagged_Standard_Library_Integration
 import Testing
 
 @testable import Input
@@ -18,7 +22,7 @@ extension Input.`Buffer Test`.Unit {
     @Test
     func `init from array`() {
         let buffer = Input.Buffer([1, 2, 3, 4, 5])
-        let expectedCount: Index<Int>.Count = 5
+        let expectedCount: Index::Index<Int>.Count = 5
         #expect(buffer.count == expectedCount)
         #expect(buffer.first == 1)
         #expect(buffer.isEmpty == false)
@@ -27,14 +31,14 @@ extension Input.`Buffer Test`.Unit {
     @Test
     func `init from sequence`() {
         let buffer = Input.Buffer(sequence: 1...5)
-        let expectedCount: Index<Int>.Count = 5
+        let expectedCount: Index::Index<Int>.Count = 5
         #expect(buffer.count == expectedCount)
         #expect(buffer.first == 1)
     }
 
     @Test
     func `init with repeating element`() {
-        let count: Index<Int>.Count = 3
+        let count: Index::Index<Int>.Count = 3
         let buffer = Input.Buffer(repeating: 42, count: count)
         #expect(buffer.count == count)
         #expect(buffer.first == 42)
@@ -44,7 +48,7 @@ extension Input.`Buffer Test`.Unit {
     func `isEmpty returns true for empty buffer`() {
         let buffer: Input.Buffer<ContiguousArray<Int>> = Input.Buffer([])
         #expect(buffer.isEmpty == true)
-        let expectedCount: Index<Int>.Count = 0
+        let expectedCount: Index::Index<Int>.Count = 0
         #expect(buffer.count == expectedCount)
         #expect(buffer.first == nil)
     }
@@ -54,7 +58,7 @@ extension Input.`Buffer Test`.Unit {
         var buffer = Input.Buffer([1, 2, 3])
         let first = try buffer.remove.first()
         #expect(first == 1)
-        let expectedCount: Index<Int>.Count = 2
+        let expectedCount: Index::Index<Int>.Count = 2
         #expect(buffer.count == expectedCount)
         #expect(buffer.first == 2)
     }
@@ -62,9 +66,9 @@ extension Input.`Buffer Test`.Unit {
     @Test
     func `remove.first(n) advances by n elements`() throws(Input.Remove.Error<Int>) {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        let three: Index<Int>.Count = 3
+        let three: Index::Index<Int>.Count = 3
         try buffer.remove.first(three)
-        let expectedCount: Index<Int>.Count = 2
+        let expectedCount: Index::Index<Int>.Count = 2
         #expect(buffer.count == expectedCount)
         #expect(buffer.first == 4)
     }
@@ -72,13 +76,13 @@ extension Input.`Buffer Test`.Unit {
     @Test
     func `consumed tracks consumption`() throws(Input.Remove.Error<Int>) {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        let expected0: Index<Int>.Count = 0
-        let expected1: Index<Int>.Count = 1
-        let expected3: Index<Int>.Count = 3
+        let expected0: Index::Index<Int>.Count = 0
+        let expected1: Index::Index<Int>.Count = 1
+        let expected3: Index::Index<Int>.Count = 3
         #expect(buffer.consumed == expected0)
         _ = try buffer.remove.first()
         #expect(buffer.consumed == expected1)
-        let two: Index<Int>.Count = 2
+        let two: Index::Index<Int>.Count = 2
         try buffer.remove.first(two)
         #expect(buffer.consumed == expected3)
     }
@@ -105,7 +109,7 @@ extension Input.`Buffer Test`.Unit {
         let cp = buffer.checkpoint
         _ = try buffer.remove.first()
         _ = try buffer.remove.first()
-        let expectedCount3: Index<Int>.Count = 3
+        let expectedCount3: Index::Index<Int>.Count = 3
         #expect(buffer.count == expectedCount3)
         do throws(Input.Restore.Error) {
             try buffer.restore.to(cp)
@@ -113,7 +117,7 @@ extension Input.`Buffer Test`.Unit {
             Issue.record("restore.to failed: \(error)")
             return
         }
-        let expectedCount5: Index<Int>.Count = 5
+        let expectedCount5: Index::Index<Int>.Count = 5
         #expect(buffer.count == expectedCount5)
         #expect(buffer.first == 1)
     }
@@ -121,9 +125,9 @@ extension Input.`Buffer Test`.Unit {
     @Test
     func `subscript offset access`() {
         let buffer = Input.Buffer([10, 20, 30, 40, 50])
-        let offset0: Index<Int>.Offset = 0
-        let offset2: Index<Int>.Offset = 2
-        let offset4: Index<Int>.Offset = 4
+        let offset0: Index::Index<Int>.Offset = 0
+        let offset2: Index::Index<Int>.Offset = 2
+        let offset4: Index::Index<Int>.Offset = 4
         #expect(buffer[offset: offset0] == 10)
         #expect(buffer[offset: offset2] == 30)
         #expect(buffer[offset: offset4] == 50)
@@ -148,7 +152,7 @@ extension Input.`Buffer Test`.Unit {
         }
         #expect(result == nil)
         #expect(buffer.isEmpty == true)
-        let expectedCount: Index<Int>.Count = 0
+        let expectedCount: Index::Index<Int>.Count = 0
         #expect(buffer.count == expectedCount)
     }
 
@@ -163,7 +167,7 @@ extension Input.`Buffer Test`.Unit {
         }
         #expect(result == 1)
         #expect(buffer.first == 2)
-        let expectedCount: Index<Int>.Count = 2
+        let expectedCount: Index::Index<Int>.Count = 2
         #expect(buffer.count == expectedCount)
     }
 }
@@ -230,9 +234,9 @@ extension Input.`Buffer Test`.`Edge Case` {
     @Test
     func `remove.first(0) is no-op`() throws(Input.Remove.Error<Int>) {
         var buffer = Input.Buffer([1, 2, 3])
-        let zero: Index<Int>.Count = 0
+        let zero: Index::Index<Int>.Count = 0
         try buffer.remove.first(zero)
-        let expectedCount: Index<Int>.Count = 3
+        let expectedCount: Index::Index<Int>.Count = 3
         #expect(buffer.count == expectedCount)
         #expect(buffer.first == 1)
     }
@@ -240,10 +244,10 @@ extension Input.`Buffer Test`.`Edge Case` {
     @Test
     func `offset access after partial consumption`() throws(Input.Remove.Error<Int>) {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
-        let two: Index<Int>.Count = 2
+        let two: Index::Index<Int>.Count = 2
         try buffer.remove.first(two)
-        let offset0: Index<Int>.Offset = 0
-        let offset2: Index<Int>.Offset = 2
+        let offset0: Index::Index<Int>.Offset = 0
+        let offset2: Index::Index<Int>.Offset = 2
         #expect(buffer[offset: offset0] == 3)
         #expect(buffer[offset: offset2] == 5)
     }
@@ -252,7 +256,7 @@ extension Input.`Buffer Test`.`Edge Case` {
     func `consumed preserved across restore`() throws(Input.Remove.Error<Int>) {
         var buffer = Input.Buffer([1, 2, 3, 4, 5])
         let cp = buffer.checkpoint
-        let three: Index<Int>.Count = 3
+        let three: Index::Index<Int>.Count = 3
         try buffer.remove.first(three)
         #expect(buffer.consumed == three)
         do throws(Input.Restore.Error) {
@@ -261,15 +265,15 @@ extension Input.`Buffer Test`.`Edge Case` {
             Issue.record("restore.to failed: \(error)")
             return
         }
-        let zero: Index<Int>.Count = 0
+        let zero: Index::Index<Int>.Count = 0
         #expect(buffer.consumed == zero)
     }
 
     @Test
     func `remove.first(n) throws when n > count`() {
         var buffer = Input.Buffer([1, 2, 3])
-        let five: Index<Int>.Count = 5
-        let three: Index<Int>.Count = 3
+        let five: Index::Index<Int>.Count = 5
+        let three: Index::Index<Int>.Count = 3
         #expect(
             throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)
         ) {
@@ -280,7 +284,7 @@ extension Input.`Buffer Test`.`Edge Case` {
     @Test
     func `restore throws for invalid checkpoint`() {
         var buffer = Input.Buffer([1, 2, 3])
-        let invalidCheckpoint: Index<Int> = 100
+        let invalidCheckpoint: Index::Index<Int> = 100
         #expect(throws: Input.Restore.Error.invalidCheckpoint) {
             try buffer.restore.to(invalidCheckpoint)
         }
@@ -290,13 +294,15 @@ extension Input.`Buffer Test`.`Edge Case` {
 extension Input.`Buffer Test`.Integration {
     @Test
     func `byte parsing scenario`() throws(Input.Remove.Error<Byte>) {
-        let bytes: [Byte] = [0x48, 0x65, 0x6C, 0x6C, 0x6F]
+        let bytes: [Byte] = [
+            Byte(0x48), Byte(0x65), Byte(0x6C), Byte(0x6C), Byte(0x6F),
+        ]
         var input = Input.Buffer(bytes)
 
         let cp = input.checkpoint
         _ = try input.remove.first()
         _ = try input.remove.first()
-        #expect(input.first == 0x6C)
+        #expect(input.first?.underlying == 0x6C)
 
         do throws(Input.Restore.Error) {
             try input.restore.to(cp)
@@ -304,17 +310,17 @@ extension Input.`Buffer Test`.Integration {
             Issue.record("restore.to failed: \(error)")
             return
         }
-        #expect(input.first == 0x48)
+        #expect(input.first?.underlying == 0x48)
     }
 
     @Test
     func `lookahead without consumption`() {
         let input = Input.Buffer([1, 2, 3, 4, 5])
-        let offset0: Index<Int>.Offset = 0
-        let offset4: Index<Int>.Offset = 4
+        let offset0: Index::Index<Int>.Offset = 0
+        let offset4: Index::Index<Int>.Offset = 4
         #expect(input[offset: offset0] == 1)
         #expect(input[offset: offset4] == 5)
-        let expectedCount: Index<Int>.Count = 5
+        let expectedCount: Index::Index<Int>.Count = 5
         #expect(input.count == expectedCount)
     }
 
@@ -327,21 +333,21 @@ extension Input.`Buffer Test`.Integration {
         }
         #expect(consumed == [1, 2, 3])
         #expect(input.isEmpty == true)
-        let expected3: Index<Int>.Count = 3
+        let expected3: Index::Index<Int>.Count = 3
         #expect(input.consumed == expected3)
     }
 
     @Test
     func `access.element(at:) total accessor`() throws(Input.Access.Error<Int>) {
         var input = Input.Buffer([1, 2, 3, 4, 5])
-        let offset0: Index<Int>.Offset = 0
-        let offset4: Index<Int>.Offset = 4
+        let offset0: Index::Index<Int>.Offset = 0
+        let offset4: Index::Index<Int>.Offset = 4
 
         let v0 = try input.access.element(at: offset0)
         let v4 = try input.access.element(at: offset4)
         #expect(v0 == 1)
         #expect(v4 == 5)
-        let offset10: Index<Int>.Offset = 10
+        let offset10: Index::Index<Int>.Offset = 10
         var threw = false
         do throws(Input.Access.Error<Int>) {
             _ = try input.access.element(at: offset10)

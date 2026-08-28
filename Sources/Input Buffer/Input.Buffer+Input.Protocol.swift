@@ -1,22 +1,36 @@
+public import Cardinal
+public import Cardinal_Carrier
+public import Cardinal_Tagged
+public import Index
+public import Input_Protocol
+public import Input_Stream
+public import Ordinal
+public import Ordinal_Cardinal
+public import Ordinal_Protocol
+public import Ordinal_Tagged
+public import Tagged
+
+internal import Cardinal_Error
+
 extension Input.Buffer: Input.`Protocol` {
 
-    public typealias Checkpoint = Index<Element>
+    public typealias Checkpoint = Index::Index<Element>
 
     public typealias Element = Storage.Element
 
     @usableFromInline
-    var _total: Index<Element>.Count {
+    var _total: Index::Index<Element>.Count {
 
         do throws(Cardinal.Error) {
-            return try Index<Element>.Count(storage.count)
+            return try Index::Index<Element>.Count(storage.count)
         } catch {
             return .zero
         }
     }
 
     @inlinable
-    public var count: Index<Element>.Count {
-        _total.subtract.saturating(Index<Element>.Count(position))
+    public var count: Index::Index<Element>.Count {
+        _total.subtract.saturating(Index::Index<Element>.Count(position))
     }
 
     @inlinable
@@ -25,8 +39,8 @@ extension Input.Buffer: Input.`Protocol` {
     }
 
     @inlinable
-    public var consumed: Index<Element>.Count {
-        Index<Element>.Count(position)
+    public var consumed: Index::Index<Element>.Count {
+        Index::Index<Element>.Count(position)
     }
 
     @inlinable
@@ -45,7 +59,9 @@ extension Input.Buffer: Input.`Protocol` {
 
     @inlinable
     public var bounds: ClosedRange<Checkpoint> {
-        .zero..._total.map(Ordinal.init)
+        .zero...Index::Index<Element>(
+            _unchecked: Ordinal(_total.underlying.rawValue)
+        )
     }
 
     @inlinable
@@ -60,7 +76,7 @@ extension Input.Buffer: Input.`Protocol` {
     }
 
     @inlinable
-    public mutating func advance(by count: Index<Element>.Count) {
+    public mutating func advance(by count: Index::Index<Element>.Count) {
         position += count
     }
 

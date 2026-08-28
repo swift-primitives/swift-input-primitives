@@ -1,3 +1,10 @@
+public import Cardinal
+public import Index
+public import Ordinal_Protocol
+public import Property
+public import Property_Inout
+public import Tagged
+
 extension Input {
 
     public enum Remove {}
@@ -6,14 +13,15 @@ extension Input {
 extension Input.Streaming where Self: ~Copyable {
 
     @inlinable
-    public var remove: Property<Input.Remove, Self>.Inout {
+    public var remove: Property::Property<Input.Remove, Self>.Inout {
         mutating _read {
-            yield Property.Inout(&self)
+            yield Property::Property<Input.Remove, Self>.Inout(&self)
         }
     }
 }
 
-extension Property.Inout where Tag == Input.Remove, Base: Input.Streaming & ~Copyable {
+extension Property::Property.Inout
+where Tag == Input.Remove, Base: Input.Streaming & ~Copyable {
 
     @inlinable
     @discardableResult
@@ -37,10 +45,13 @@ extension Property.Inout where Tag == Input.Remove, Base: Input.Streaming & ~Cop
     }
 }
 
-extension Property.Inout where Tag == Input.Remove, Base: Input.`Protocol` & ~Copyable {
+extension Property::Property.Inout
+where Tag == Input.Remove, Base: Input.`Protocol` & ~Copyable {
 
     @inlinable
-    public func first(_ count: Index<Base.Element>.Count) throws(Input.Remove.Error<Base.Element>) {
+    public func first(
+        _ count: Index::Index<Base.Element>.Count
+    ) throws(Input.Remove.Error<Base.Element>) {
         let available = base.value.count
         guard count <= available else {
             throw .insufficientElements(requested: count, available: available)
@@ -49,7 +60,7 @@ extension Property.Inout where Tag == Input.Remove, Base: Input.`Protocol` & ~Co
     }
 
     @inlinable
-    public func first(__unchecked: Void, _ count: Index<Base.Element>.Count) {
+    public func first(__unchecked: Void, _ count: Index::Index<Base.Element>.Count) {
         base.value.advance(by: count)
     }
 }

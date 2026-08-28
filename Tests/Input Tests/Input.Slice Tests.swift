@@ -1,7 +1,20 @@
+import Affine_Tagged
+import Cardinal
+import Cardinal_Carrier
+import Carrier_Protocol
+import Collection_Protocol
+import Index
 import Input_Test_Support
-import Iterable
+import Iterator
 import Iterator_Chunk
-import Sequence
+import Ordinal
+import Ordinal_Error
+import Ordinal_Protocol
+import Ordinal_Successor
+import Ordinal_Tagged
+import Sequence_Borrowing
+import Tagged
+import Tagged_Standard_Library_Integration
 import Testing
 
 @testable import Input
@@ -18,12 +31,14 @@ extension TestCollection {
     }
 }
 
-extension TestCollection.Iterator: Iterator.Chunk.`Protocol` {
+extension TestCollection.Iterator: Iterator::Iterator.Chunk.`Protocol` {
     typealias Failure = Never
 
     @_lifetime(&self)
-    mutating func next(maximumCount: some Carrier.`Protocol`<Cardinal>) -> Span<Element> {
-        let ptr = unsafe withUnsafeMutablePointer(to: &_element) { p in
+    mutating func next(
+        maximumCount: some Carrier::Carrier.`Protocol`<Cardinal>
+    ) -> Span<Element> {
+        let ptr = withUnsafeMutablePointer(to: &_element) { p in
             unsafe UnsafePointer<Element>(
                 unsafe UnsafeRawPointer(p).assumingMemoryBound(to: Element.self)
             )
@@ -50,17 +65,19 @@ extension TestCollection.Iterator: Iterator.Chunk.`Protocol` {
 }
 
 extension TestCollection: Collection.`Protocol` {
-    var startIndex: Index.Index<Element> { .zero }
+    var startIndex: Index::Index<Element> { .zero }
 
-    var endIndex: Index.Index<Element> {
-        Index.Index<Element>.Count(Cardinal(UInt(storage.count))).map(Ordinal.init)
+    var endIndex: Index::Index<Element> {
+        Index::Index<Element>(
+            _unchecked: Ordinal(UInt(storage.count))
+        )
     }
 
-    subscript(position: Index.Index<Element>) -> Element {
-        storage[Int(bitPattern: position)]
+    subscript(position: Index::Index<Element>) -> Element {
+        storage[Int(bitPattern: position.underlying.rawValue)]
     }
 
-    func index(after i: Index.Index<Element>) -> Index.Index<Element> {
+    func index(after i: Index::Index<Element>) -> Index::Index<Element> {
         do throws(Ordinal.Error) {
             return try i.successor.exact()
         } catch {
@@ -89,7 +106,7 @@ extension Input.`Slice Test`.Unit {
     func `init from collection`() {
         let collection = TestCollection(storage: [1, 2, 3, 4, 5])
         let slice = Input.Slice(collection)
-        let expectedCount: Index<Int>.Count = 5
+        let expectedCount: Index::Index<Int>.Count = 5
         #expect(slice.count == expectedCount)
         #expect(slice.first == 1)
         #expect(!slice.isEmpty)
@@ -100,7 +117,7 @@ extension Input.`Slice Test`.Unit {
         let collection = TestCollection<Int>(storage: [])
         let slice = Input.Slice(collection)
         #expect(slice.isEmpty)
-        let expectedCount: Index<Int>.Count = 0
+        let expectedCount: Index::Index<Int>.Count = 0
         #expect(slice.count == expectedCount)
         #expect(slice.first == nil)
     }
@@ -111,7 +128,7 @@ extension Input.`Slice Test`.Unit {
         var slice = Input.Slice(collection)
         let first = try slice.remove.first()
         #expect(first == 1)
-        let expectedCount: Index<Int>.Count = 2
+        let expectedCount: Index::Index<Int>.Count = 2
         #expect(slice.count == expectedCount)
         #expect(slice.first == 2)
     }
@@ -120,9 +137,9 @@ extension Input.`Slice Test`.Unit {
     func `remove.first(n) advances by n elements`() throws(Input.Remove.Error<Int>) {
         let collection = TestCollection(storage: [1, 2, 3, 4, 5])
         var slice = Input.Slice(collection)
-        let three: Index<Int>.Count = 3
+        let three: Index::Index<Int>.Count = 3
         try slice.remove.first(three)
-        let expectedCount: Index<Int>.Count = 2
+        let expectedCount: Index::Index<Int>.Count = 2
         #expect(slice.count == expectedCount)
         #expect(slice.first == 4)
     }
@@ -151,7 +168,7 @@ extension Input.`Slice Test`.Unit {
         let cp = slice.checkpoint
         _ = try slice.remove.first()
         _ = try slice.remove.first()
-        let expectedCount3: Index<Int>.Count = 3
+        let expectedCount3: Index::Index<Int>.Count = 3
         #expect(slice.count == expectedCount3)
         do throws(Input.Restore.Error) {
             try slice.restore.to(cp)
@@ -159,7 +176,7 @@ extension Input.`Slice Test`.Unit {
             Issue.record("restore.to failed: \(error)")
             return
         }
-        let expectedCount5: Index<Int>.Count = 5
+        let expectedCount5: Index::Index<Int>.Count = 5
         #expect(slice.count == expectedCount5)
         #expect(slice.first == 1)
     }
@@ -168,9 +185,9 @@ extension Input.`Slice Test`.Unit {
     func `subscript offset access`() {
         let collection = TestCollection(storage: [10, 20, 30, 40, 50])
         let slice = Input.Slice(collection)
-        let offset0: Index<Int>.Offset = 0
-        let offset2: Index<Int>.Offset = 2
-        let offset4: Index<Int>.Offset = 4
+        let offset0: Index::Index<Int>.Offset = 0
+        let offset2: Index::Index<Int>.Offset = 2
+        let offset4: Index::Index<Int>.Offset = 4
         #expect(slice[offset: offset0] == 10)
         #expect(slice[offset: offset2] == 30)
         #expect(slice[offset: offset4] == 50)
@@ -221,7 +238,7 @@ extension Input.`Slice Test`.Unit {
         }
         #expect(result == 1)
         #expect(slice.first == 2)
-        let expectedCount: Index<Int>.Count = 2
+        let expectedCount: Index::Index<Int>.Count = 2
         #expect(slice.count == expectedCount)
     }
 }
@@ -292,9 +309,9 @@ extension Input.`Slice Test`.`Edge Case` {
     func `remove.first(0) is no-op`() throws(Input.Remove.Error<Int>) {
         let collection = TestCollection(storage: [1, 2, 3])
         var slice = Input.Slice(collection)
-        let zero: Index<Int>.Count = 0
+        let zero: Index::Index<Int>.Count = 0
         try slice.remove.first(zero)
-        let expectedCount: Index<Int>.Count = 3
+        let expectedCount: Index::Index<Int>.Count = 3
         #expect(slice.count == expectedCount)
         #expect(slice.first == 1)
     }
@@ -303,10 +320,10 @@ extension Input.`Slice Test`.`Edge Case` {
     func `offset access after partial consumption`() throws(Input.Remove.Error<Int>) {
         let collection = TestCollection(storage: [1, 2, 3, 4, 5])
         var slice = Input.Slice(collection)
-        let two: Index<Int>.Count = 2
+        let two: Index::Index<Int>.Count = 2
         try slice.remove.first(two)
-        let offset0: Index<Int>.Offset = 0
-        let offset2: Index<Int>.Offset = 2
+        let offset0: Index::Index<Int>.Offset = 0
+        let offset2: Index::Index<Int>.Offset = 2
         #expect(slice[offset: offset0] == 3)
         #expect(slice[offset: offset2] == 5)
     }
@@ -315,8 +332,8 @@ extension Input.`Slice Test`.`Edge Case` {
     func `remove.first(n) throws when n > count`() {
         let collection = TestCollection(storage: [1, 2, 3])
         var slice = Input.Slice(collection)
-        let five: Index<Int>.Count = 5
-        let three: Index<Int>.Count = 3
+        let five: Index::Index<Int>.Count = 5
+        let three: Index::Index<Int>.Count = 3
         #expect(
             throws: Input.Remove.Error<Int>.insufficientElements(requested: five, available: three)
         ) {
@@ -349,14 +366,14 @@ extension Input.`Slice Test`.Integration {
     func `access.element(at:) total accessor`() throws(Input.Access.Error<Int>) {
         let collection = TestCollection(storage: [1, 2, 3, 4, 5])
         var input = Input.Slice(collection)
-        let offset0: Index<Int>.Offset = 0
-        let offset4: Index<Int>.Offset = 4
+        let offset0: Index::Index<Int>.Offset = 0
+        let offset4: Index::Index<Int>.Offset = 4
 
         let v0 = try input.access.element(at: offset0)
         let v4 = try input.access.element(at: offset4)
         #expect(v0 == 1)
         #expect(v4 == 5)
-        let offset10: Index<Int>.Offset = 10
+        let offset10: Index::Index<Int>.Offset = 10
         var threw = false
         do throws(Input.Access.Error<Int>) {
             _ = try input.access.element(at: offset10)

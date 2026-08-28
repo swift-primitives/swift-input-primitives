@@ -58,39 +58,39 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-molecules/swift-collection.git",
+            url: "https://github.com/swift-atoms/swift-collection.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-equation.git",
+            url: "https://github.com/swift-atoms/swift-equation.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-comparison.git",
+            url: "https://github.com/swift-atoms/swift-comparison.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-hash.git",
+            url: "https://github.com/swift-atoms/swift-hash.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-property.git",
+            url: "https://github.com/swift-atoms/swift-property.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-index.git",
+            url: "https://github.com/swift-atoms/swift-index.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-byte.git",
+            url: "https://github.com/swift-atoms/swift-byte.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-iterator.git",
+            url: "https://github.com/swift-atoms/swift-iterator.git",
             branch: "main"
         ),
         .package(
-            url: "https://github.com/swift-molecules/swift-sequence.git",
+            url: "https://github.com/swift-atoms/swift-sequence.git",
             branch: "main"
         ),
     ],
@@ -103,16 +103,16 @@ let package = Package(
         .target(
             name: "Input Stream",
             dependencies: [
-                "Input Namespace"
+                .target(name: "Input Namespace")
             ]
         ),
 
         .target(
             name: "Input Protocol",
             dependencies: [
-                "Input Namespace",
-                "Input Restore",
-                "Input Stream",
+                .target(name: "Input Namespace"),
+                .target(name: "Input Restore"),
+                .target(name: "Input Stream"),
                 .product(name: "Index", package: "swift-index"),
                 .product(name: "Property", package: "swift-property"),
             ]
@@ -121,8 +121,8 @@ let package = Package(
         .target(
             name: "Input Access",
             dependencies: [
-                "Input Namespace",
-                "Input Protocol",
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
                 .product(name: "Index", package: "swift-index"),
                 .product(name: "Property", package: "swift-property"),
             ]
@@ -131,9 +131,9 @@ let package = Package(
         .target(
             name: "Input Remove",
             dependencies: [
-                "Input Namespace",
-                "Input Protocol",
-                "Input Stream",
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .target(name: "Input Stream"),
                 .product(name: "Index", package: "swift-index"),
                 .product(name: "Property", package: "swift-property"),
             ]
@@ -142,7 +142,7 @@ let package = Package(
         .target(
             name: "Input Restore",
             dependencies: [
-                "Input Namespace",
+                .target(name: "Input Namespace"),
                 .product(name: "Property", package: "swift-property"),
             ]
         ),
@@ -150,10 +150,10 @@ let package = Package(
         .target(
             name: "Input Buffer",
             dependencies: [
-                "Input Access",
-                "Input Namespace",
-                "Input Protocol",
-                "Input Stream",
+                .target(name: "Input Access"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .target(name: "Input Stream"),
                 .product(name: "Index", package: "swift-index"),
             ]
         ),
@@ -161,9 +161,9 @@ let package = Package(
         .target(
             name: "Input Slice",
             dependencies: [
-                "Input Access",
-                "Input Namespace",
-                "Input Protocol",
+                .target(name: "Input Access"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
                 .product(name: "Collection", package: "swift-collection"),
                 .product(name: "Comparison", package: "swift-comparison"),
                 .product(name: "Equation", package: "swift-equation"),
@@ -177,21 +177,21 @@ let package = Package(
         .target(
             name: "Input",
             dependencies: [
-                "Input Access",
-                "Input Buffer",
-                "Input Namespace",
-                "Input Protocol",
-                "Input Remove",
-                "Input Restore",
-                "Input Slice",
-                "Input Stream",
+                .target(name: "Input Access"),
+                .target(name: "Input Buffer"),
+                .target(name: "Input Namespace"),
+                .target(name: "Input Protocol"),
+                .target(name: "Input Remove"),
+                .target(name: "Input Restore"),
+                .target(name: "Input Slice"),
+                .target(name: "Input Stream"),
             ]
         ),
 
         .target(
             name: "Input Test Support",
             dependencies: [
-                "Input",
+                .target(name: "Input"),
                 .product(name: "Index Test Support", package: "swift-index"),
             ],
             path: "Tests/Support"
@@ -199,8 +199,8 @@ let package = Package(
         .testTarget(
             name: "Input Tests",
             dependencies: [
-                "Input",
-                "Input Test Support",
+                .target(name: "Input"),
+                .target(name: "Input Test Support"),
                 .product(name: "Iterator Chunk", package: "swift-iterator"),
                 .product(name: "Byte", package: "swift-byte"),
                 .product(name: "Sequence", package: "swift-sequence"),

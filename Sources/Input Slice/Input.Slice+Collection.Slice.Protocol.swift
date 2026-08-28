@@ -2,7 +2,7 @@ public import Collection
 public import Index
 public import Iterable
 public import Iterator_Chunk
-public import Iterator_Primitive
+public import Iterator
 
 extension Input.Slice
 where
@@ -10,7 +10,7 @@ where
     Base.Index == Index.Index<Base.Element>
 {
 
-    public struct Iterator: Iterator_Primitive.Iterator.`Protocol` {
+    public struct Iterator: Iterator.Iterator.`Protocol` {
         @usableFromInline let base: Base
         @usableFromInline let _upper: Base.Index
         @usableFromInline var current: Base.Index
@@ -48,15 +48,15 @@ where
 {
 
     @_implements(Iterable,Iterator)
-    public typealias IterableIterator = Iterator_Primitive.Iterator.Materializing<Iterator>
+    public typealias IterableIterator = Iterator.Iterator.Materializing<Iterator>
 
     @inlinable
     @_lifetime(borrow self)
     @_implements(Iterable,makeIterator())
     public borrowing func iterableMakeIterator()
-        -> Iterator_Primitive.Iterator.Materializing<Iterator>
+        -> Iterator.Iterator.Materializing<Iterator>
     {
-        Iterator_Primitive.Iterator.Materializing(Iterator(base: base, start: _index, end: _upper))
+        Iterator.Iterator.Materializing(Iterator(base: base, start: _index, end: _upper))
     }
 
     @inlinable

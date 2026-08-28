@@ -1,4 +1,4 @@
-# Input
+# Input Primitives
 
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
 
@@ -52,7 +52,7 @@ Add to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-molecules/swift-input.git", branch: "main"),
+    .package(url: "https://github.com/swift-atoms/swift-input.git", branch: "main"),
 ]
 ```
 
@@ -75,15 +75,15 @@ Nine variant libraries plus an umbrella product and a Test Support spine. Consum
 
 | Product | When to import | What's in it |
 |---------|---------------|--------------|
-| `Input` | Default for application code | The full protocol family + concrete cursors. Re-exports all 8 sub-targets so a single `import Input` brings the entire surface into scope. |
-| `Input Namespace` | Defining the `Input` namespace shell from a sibling package | Just the `public enum Input` namespace shell. |
-| `Input Protocol` | Conforming a custom cursor type to `Input.Protocol` | `Input.Protocol` + default impls (validation, advance, etc.). |
-| `Input Stream` | Stream-only cursors that don't need checkpointing | `Input.Stream.Protocol` + `Input.Stream` namespace + `Input.Stream.Error`. |
-| `Input Access` | Cursors with random-access subscript | `Input.Access.Random` + `Input.Access.Error`. |
-| `Input Buffer` | Owned-buffer cursor types | `Input.Buffer<Storage>` + protocol conformances. |
-| `Input Slice` | Zero-copy slice cursors over `Collection.Protocol` conformers | `Input.Slice<Base>` + protocol conformances (Input, Collection.Slice, Comparison, Equation, Hash). |
-| `Input Remove` | The fluent `.remove.first()` / `.remove.first(_:)` surface | `Input.Remove` View + `Input.Remove.Error`. |
-| `Input Restore` | The fluent `.restore.to(_:)` surface | `Input.Restore` View + `Input.Restore.Error`. |
+| `Input Primitives` | Default for application code | The full protocol family + concrete cursors. Re-exports all 8 sub-targets so a single `import Input` brings the entire surface into scope. |
+| `Input Namespace Primitives` | Defining the `Input` namespace shell from a sibling package | Just the `public enum Input` namespace shell. |
+| `Input Protocol Primitives` | Conforming a custom cursor type to `Input.Protocol` | `Input.Protocol` + default impls (validation, advance, etc.). |
+| `Input Stream Primitives` | Stream-only cursors that don't need checkpointing | `Input.Stream.Protocol` + `Input.Stream` namespace + `Input.Stream.Error`. |
+| `Input Access Primitives` | Cursors with random-access subscript | `Input.Access.Random` + `Input.Access.Error`. |
+| `Input Buffer Primitives` | Owned-buffer cursor types | `Input.Buffer<Storage>` + protocol conformances. |
+| `Input Slice Primitives` | Zero-copy slice cursors over `Collection.Protocol` conformers | `Input.Slice<Base>` + protocol conformances (Input, Collection.Slice, Comparison, Equation, Hash). |
+| `Input Remove Primitives` | The fluent `.remove.first()` / `.remove.first(_:)` surface | `Input.Remove` View + `Input.Remove.Error`. |
+| `Input Restore Primitives` | The fluent `.restore.to(_:)` surface | `Input.Restore` View + `Input.Restore.Error`. |
 | `Input Test Support` | Test targets | `Input.Fixture.Source` and re-exports for downstream test consumers. |
 
 Foundation-free. No concurrency surface. No platform conditionals.
@@ -162,11 +162,11 @@ Pre-1.0. The public API of `Input.Protocol` and its members may change while the
 
 Direct dependencies (all already-public):
 
-- [swift-collection](https://github.com/swift-molecules/swift-collection) — `Collection.Protocol` family + `Collection.Slice.Protocol`, the bridges `Input.Slice` conforms to for indexed cursor access.
-- [swift-sequence](https://github.com/swift-molecules/swift-sequence) — `Sequence.Protocol` + `Sequence.Iterator.Protocol`, the iterator family the slice cursor's `CollectionIterator` conforms to.
-- [swift-index](https://github.com/swift-molecules/swift-index) — `Index<Element>`, `Index.Offset`, `Index.Count`, the typed-position surface every cursor stores positions in.
-- [swift-property](https://github.com/swift-molecules/swift-property) — `Property<Tag, Base>.Inout`, the phantom-tagged fluent-accessor machinery that powers `.remove.first()`, `.restore.to(_:)`, and friends.
-- [swift-comparison](https://github.com/swift-molecules/swift-comparison), [swift-equation](https://github.com/swift-molecules/swift-equation), [swift-hash](https://github.com/swift-molecules/swift-hash) — base protocols `Input.Slice` conforms to for comparator/equator/hasher integration in parser combinators.
+- [swift-collection](https://github.com/swift-atoms/swift-collection) — `Collection.Protocol` family + `Collection.Slice.Protocol`, the bridges `Input.Slice` conforms to for indexed cursor access.
+- [swift-sequence](https://github.com/swift-atoms/swift-sequence) — `Sequence.Protocol` + `Sequence.Iterator.Protocol`, the iterator family the slice cursor's `CollectionIterator` conforms to.
+- [swift-index](https://github.com/swift-atoms/swift-index) — `Index<Element>`, `Index.Offset`, `Index.Count`, the typed-position surface every cursor stores positions in.
+- [swift-property](https://github.com/swift-atoms/swift-property) — `Property<Tag, Base>.Inout`, the phantom-tagged fluent-accessor machinery that powers `.remove.first()`, `.restore.to(_:)`, and friends.
+- [swift-comparison](https://github.com/swift-atoms/swift-comparison), [swift-equation](https://github.com/swift-atoms/swift-equation), [swift-hash](https://github.com/swift-atoms/swift-hash) — base protocols `Input.Slice` conforms to for comparator/equator/hasher integration in parser combinators.
 
 ---
 

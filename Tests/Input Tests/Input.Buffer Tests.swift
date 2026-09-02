@@ -294,15 +294,13 @@ extension Input.`Buffer Test`.`Edge Case` {
 extension Input.`Buffer Test`.Integration {
     @Test
     func `byte parsing scenario`() throws(Input.Remove.Error<Byte>) {
-        let bytes: [Byte] = [
-            Byte(0x48), Byte(0x65), Byte(0x6C), Byte(0x6C), Byte(0x6F),
-        ]
+        let bytes = [0x48, 0x65, 0x6C, 0x6C, 0x6F].map { Byte(bitPattern: $0) }
         var input = Input.Buffer(bytes)
 
         let cp = input.checkpoint
         _ = try input.remove.first()
         _ = try input.remove.first()
-        #expect(input.first?.underlying == 0x6C)
+        #expect(input.first?.bitPattern == 0x6C)
 
         do throws(Input.Restore.Error) {
             try input.restore.to(cp)
@@ -310,7 +308,7 @@ extension Input.`Buffer Test`.Integration {
             Issue.record("restore.to failed: \(error)")
             return
         }
-        #expect(input.first?.underlying == 0x48)
+        #expect(input.first?.bitPattern == 0x48)
     }
 
     @Test
